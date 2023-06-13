@@ -6,3 +6,65 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  role                UserRole
+  email               String
+  password            String
+  isVerified          Boolean
+  createdAt           DateTime              @default(now())
+  companies           Company[]
+  commentsOnCompanies CommentsOnCompanies[]
+}
+
+model Company {
+  id                         Int                   @id @default(autoincrement())
+  name                       String
+  country                    String
+  city                       String
+  website                    String
+  linkedIn                   String?
+  supportsSponsorshipProgram SponsorshipSupport
+  createdAt                  DateTime              @default(now())
+  user                       User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId                     Int?                  @unique
+  isApproved                 Boolean
+  commentsOnCompanies        CommentsOnCompanies[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model CommentsOnCompanies {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
+
+  company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId  Int     @unique
+  isApproved Boolean
+}
+
+model Bookmarks {
+  id Int @id @default(autoincrement())
+  userId Int  
+  companyId Int     
+  createdAt DateTime @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum SponsorshipSupport {
+  UNKNOWN
+  NO
+  YES
+}
