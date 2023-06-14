@@ -3,14 +3,8 @@ export interface ISingleJwt {
   time: number;
 }
 
-export interface IAccessJwt {
-  publicKey: string;
-  privateKey: string;
-  time: number;
-}
-
 export interface IJwt {
-  access: IAccessJwt;
+  access: ISingleJwt;
   confirmation: ISingleJwt;
   resetPassword: ISingleJwt;
   refresh: ISingleJwt;

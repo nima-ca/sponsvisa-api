@@ -10,10 +10,10 @@ datasource db {
 model User {
   id                  Int                   @id @default(autoincrement())
   name                String
-  role                UserRole
+  role                UserRole              @default(USER)
   email               String
   password            String
-  isVerified          Boolean
+  isVerified          Boolean               @default(false)
   createdAt           DateTime              @default(now())
   companies           Company[]
   commentsOnCompanies CommentsOnCompanies[]
@@ -30,7 +30,7 @@ model Company {
   createdAt                  DateTime              @default(now())
   user                       User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId                     Int?                  @unique
-  isApproved                 Boolean
+  isApproved                 Boolean               @default(false)
   commentsOnCompanies        CommentsOnCompanies[]
 }
 
@@ -48,13 +48,13 @@ model CommentsOnCompanies {
 
   company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId  Int     @unique
-  isApproved Boolean
+  isApproved Boolean @default(false)
 }
 
 model Bookmarks {
-  id Int @id @default(autoincrement())
-  userId Int  
-  companyId Int     
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  companyId Int
   createdAt DateTime @default(now())
 }
 
