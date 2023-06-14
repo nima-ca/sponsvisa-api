@@ -10,6 +10,7 @@ import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
 import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
+import { IAccessTokenPayload } from "src/config/interfaces/jwt.interface";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -63,7 +64,7 @@ export class AuthService {
     }
 
     // create token
-    const tokenPayload = { id: user.id };
+    const tokenPayload: IAccessTokenPayload = { id: user.id };
     const token = this.jwtService.signAccessToken(tokenPayload);
 
     return { success: true, error: null, token };

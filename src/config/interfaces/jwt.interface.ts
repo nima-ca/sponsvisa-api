@@ -9,3 +9,7 @@ export interface IJwt {
   resetPassword: ISingleJwt;
   refresh: ISingleJwt;
 }
+
+export interface IAccessTokenPayload {
+  id: number;
+}
