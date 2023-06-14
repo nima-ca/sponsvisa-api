@@ -34,7 +34,7 @@ export class AuthService {
       throw new UserAlreadyExistsException();
     }
 
-    const hashedPassword = await bcrypt.hash(password, PASSWORD_HASH_SALT);
+    const hashedPassword = bcrypt.hashSync(password, PASSWORD_HASH_SALT);
 
     await this.prisma.user.create({
       data: {
@@ -58,7 +58,8 @@ export class AuthService {
     }
 
     // check if password is correct
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+
     if (!isPasswordCorrect) {
       throw new IncorrectCredentialsException();
     }

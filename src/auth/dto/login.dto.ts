@@ -16,7 +16,7 @@ import {
   PASSWORD_MAX_LENGTH_MESSAGE,
   PASSWORD_MIN_LENGTH,
   PASSWORD_MIN_LENGTH_MESSAGE,
-} from "../constants/register.constants";
+} from "../constants/auth.constants";
 import { PASSWORD_REGEX } from "src/common/constants/regex.const";
 
 export class LoginDto {

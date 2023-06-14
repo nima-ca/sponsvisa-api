@@ -18,7 +18,7 @@ import {
   PASSWORD_MAX_LENGTH_MESSAGE,
   PASSWORD_MIN_LENGTH,
   PASSWORD_MIN_LENGTH_MESSAGE,
-} from "../constants/register.constants";
+} from "../constants/auth.constants";
 import { stringGenerator } from "src/common/utils/generator.utils";
 
 describe(`Register DTO`, () => {

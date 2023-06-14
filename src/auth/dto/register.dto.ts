@@ -26,7 +26,7 @@ import {
   CONFIRM_PASSWORD_IS_NOT_VALID_MESSAGE,
   CONFIRM_PASSWORD_MIN_LENGTH_MESSAGE,
   CONFIRM_PASSWORD_MAX_LENGTH_MESSAGE,
-} from "../constants/register.constants";
+} from "../constants/auth.constants";
 import { CoreResponseDto } from "src/common/dto/common.dto";
 
 export class RegisterDto {
