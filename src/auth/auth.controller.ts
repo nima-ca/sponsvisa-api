@@ -7,14 +7,14 @@ import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post(`register`)
   async register(
     @Body() registerDto: RegisterDto,
   ): Promise<RegisterResponseDto> {
     return await this.authService.register(registerDto);
   }
 
-  @Post()
+  @Post(`login`)
   async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     return await this.authService.login(loginDto);
   }

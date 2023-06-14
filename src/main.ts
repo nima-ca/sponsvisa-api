@@ -1,6 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe, VersioningType } from "@nestjs/common";
+import { BadRequestExceptionFilter } from "./httpExceptions/http-exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,8 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+
+  app.useGlobalFilters(new BadRequestExceptionFilter());
 
   await app.listen(3000);
 }
