@@ -1,12 +1,11 @@
-import {
-  Injectable,
-  BadRequestException,
-  InternalServerErrorException,
-} from "@nestjs/common";
-import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
-import { LoginDto, LoginResponseDto } from "./dto/login.dto";
-import { PrismaService } from "src/prisma/prisma.service";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
+import { PrismaService } from "src/prisma/prisma.service";
+import { LoginDto, LoginResponseDto } from "./dto/login.dto";
+import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
+import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
+
+export const PASSWORD_HASH_SALT = 10;
 
 @Injectable()
 export class AuthService {
@@ -23,12 +22,10 @@ export class AuthService {
       });
 
       if (user) {
-        throw new BadRequestException(
-          `User already exists with the same email`,
-        );
+        throw new UserAlreadyExistsException();
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, PASSWORD_HASH_SALT);
 
       await this.prisma.user.create({
         data: {
@@ -40,7 +37,7 @@ export class AuthService {
 
       return { success: true, error: null };
     } catch (error) {
-      if (error instanceof BadRequestException) {
+      if (error instanceof UserAlreadyExistsException) {
         return { success: false, error: error.message };
       }
 
