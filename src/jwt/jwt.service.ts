@@ -12,8 +12,13 @@ export class JwtService {
     return JWT.sign(payload, jwtOptions.access.secret);
   }
 
-  verifyAccessToken<T = unknown>(token: string): T {
+  verifyAccessToken<T = unknown>(token: string): T | null {
     const jwtOptions = this.configService.get<IJwt>(`jwt`);
-    return JWT.verify(token, jwtOptions.access.secret) as T;
+
+    try {
+      return JWT.verify(token, jwtOptions.access.secret) as T;
+    } catch (error) {
+      return null;
+    }
   }
 }

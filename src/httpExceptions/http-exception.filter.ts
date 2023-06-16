@@ -5,6 +5,9 @@ import {
   HttpException,
 } from "@nestjs/common";
 import { Response } from "express";
+import { I18nContext } from "nestjs-i18n";
+import { CoreResponseDto } from "src/common/dto/common.dto";
+import { I18nTranslations } from "src/generated/i18n.generated";
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
@@ -13,17 +16,21 @@ export class AllExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
 
-    if (status === 400) {
-      response.status(status).json({
-        success: false,
-        errors: [exception.message],
-      });
-      // check for 500 family error
-    } else if (status.toString().startsWith(`5`)) {
-      response.status(status).json({
-        success: false,
-        errors: [`Something went wrong!`],
-      });
+    const resObj: CoreResponseDto = {
+      success: false,
+      error: [exception.message],
+    };
+
+    if (status.toString().startsWith(`5`)) {
+      const i18n = I18nContext.current<I18nTranslations>();
+      const internalServerError = i18n.t(
+        `common.errors.internalServerException`,
+      );
+      resObj.error = [internalServerError];
+      response.status(status).json(resObj);
+      return;
     }
+
+    response.status(status).json(resObj);
   }
 }
