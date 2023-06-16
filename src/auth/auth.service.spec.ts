@@ -74,6 +74,7 @@ describe(`AuthService`, () => {
 
     it(`should hash the password`, async () => {
       prisma.user.findFirst = jest.fn().mockReturnValue(null);
+      prisma.user.create = jest.fn();
       jest.mocked(bcrypt.hashSync).mockReturnValue(`hashed-password`);
       await service.register(mockedData, i18n);
 
