@@ -4,7 +4,9 @@ import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
 import { I18n, I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/generated/i18n.generated";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags(`auth`)
 @Controller({
   path: `auth`,
   version: `1`,
