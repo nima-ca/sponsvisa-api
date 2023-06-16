@@ -1,17 +1,17 @@
+import { InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { I18nContext } from "nestjs-i18n";
+import { I18nTranslations } from "src/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthService, PASSWORD_HASH_SALT } from "./auth.service";
-import { RegisterDto } from "./dto/register.dto";
-import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
-import { InternalServerErrorException } from "@nestjs/common";
 import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
-import { I18nContext, I18nService } from "nestjs-i18n";
-import { I18nTranslations } from "src/generated/i18n.generated";
+import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
 
 jest.mock(`bcrypt`);
 describe(`AuthService`, () => {

@@ -28,6 +28,13 @@ export type I18nTranslations = {
         "exceptions": {
             "userAlreadyExists": string;
             "incorrectCredentials": string;
+            "invalidToken": string;
+            "notAuthorized": string;
+        };
+    };
+    "common": {
+        "errors": {
+            "internalServerException": string;
         };
     };
 };
