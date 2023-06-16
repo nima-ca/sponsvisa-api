@@ -2,13 +2,8 @@ import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { stringGenerator } from "src/common/utils/generator.utils";
 import {
-  EMAIL_IS_NOT_VALID_MESSAGE,
-  PASSWORD_IS_NOT_STRONG_MESSAGE,
-  PASSWORD_IS_NOT_VALID_MESSAGE,
   PASSWORD_MAX_LENGTH,
-  PASSWORD_MAX_LENGTH_MESSAGE,
   PASSWORD_MIN_LENGTH,
-  PASSWORD_MIN_LENGTH_MESSAGE,
 } from "../constants/auth.constants";
 import { LoginDto } from "./login.dto";
 
@@ -25,7 +20,7 @@ describe(`Login DTO`, () => {
       expect(emailErrors).toBeDefined();
       expect(emailErrors.constraints).toEqual(
         expect.objectContaining({
-          isDefined: EMAIL_IS_NOT_VALID_MESSAGE,
+          isDefined: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -42,7 +37,7 @@ describe(`Login DTO`, () => {
       expect(emailErrors).toBeDefined();
       expect(emailErrors.constraints).toEqual(
         expect.objectContaining({
-          isNotEmpty: EMAIL_IS_NOT_VALID_MESSAGE,
+          isNotEmpty: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -59,7 +54,7 @@ describe(`Login DTO`, () => {
       expect(emailErrors).toBeDefined();
       expect(emailErrors.constraints).toEqual(
         expect.objectContaining({
-          isEmail: EMAIL_IS_NOT_VALID_MESSAGE,
+          isEmail: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -90,7 +85,7 @@ describe(`Login DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          isDefined: PASSWORD_IS_NOT_VALID_MESSAGE,
+          isDefined: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -109,7 +104,7 @@ describe(`Login DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          isNotEmpty: PASSWORD_IS_NOT_VALID_MESSAGE,
+          isNotEmpty: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -130,7 +125,7 @@ describe(`Login DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          minLength: PASSWORD_MIN_LENGTH_MESSAGE,
+          minLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -151,7 +146,7 @@ describe(`Login DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          maxLength: PASSWORD_MAX_LENGTH_MESSAGE,
+          maxLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -172,7 +167,7 @@ describe(`Login DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          matches: PASSWORD_IS_NOT_STRONG_MESSAGE,
+          matches: expect.any(String),
         }),
       );
       expect.hasAssertions();

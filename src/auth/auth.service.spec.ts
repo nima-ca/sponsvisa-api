@@ -10,12 +10,18 @@ import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exc
 import { InternalServerErrorException } from "@nestjs/common";
 import { LoginDto } from "./dto/login.dto";
 import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
+import { I18nContext, I18nService } from "nestjs-i18n";
+import { I18nTranslations } from "src/generated/i18n.generated";
 
 jest.mock(`bcrypt`);
 describe(`AuthService`, () => {
   let service: AuthService;
   let prisma: PrismaClient;
   let jwtService: JwtService;
+
+  const i18n = {
+    t: jest.fn().mockReturnValue(`random translated text`),
+  } as unknown as I18nContext<I18nTranslations>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -43,7 +49,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst = jest.fn().mockReturnValue({ id: 1 });
 
       try {
-        await service.register(mockedData);
+        await service.register(mockedData, i18n);
       } catch (error) {}
 
       expect(prisma.user.findFirst).toHaveBeenCalledTimes(1);
@@ -57,7 +63,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst = jest.fn().mockReturnValue({ id: 1 });
 
       try {
-        await service.register(mockedData);
+        await service.register(mockedData, i18n);
       } catch (error) {
         expect(error).toBeDefined();
         expect(error).toBeInstanceOf(UserAlreadyExistsException);
@@ -69,7 +75,7 @@ describe(`AuthService`, () => {
     it(`should hash the password`, async () => {
       prisma.user.findFirst = jest.fn().mockReturnValue(null);
       jest.mocked(bcrypt.hashSync).mockReturnValue(`hashed-password`);
-      await service.register(mockedData);
+      await service.register(mockedData, i18n);
 
       expect(bcrypt.hashSync).toHaveBeenCalledTimes(1);
       expect(bcrypt.hashSync).toHaveBeenCalledWith(
@@ -83,7 +89,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst = jest.fn().mockReturnValue(null);
       prisma.user.create = jest.fn().mockReturnValue(null);
 
-      const result = await service.register(mockedData);
+      const result = await service.register(mockedData, i18n);
 
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
       expect(prisma.user.create).toHaveBeenCalledWith({
@@ -102,7 +108,7 @@ describe(`AuthService`, () => {
       });
 
       try {
-        await service.register(mockedData);
+        await service.register(mockedData, i18n);
       } catch (error) {
         expect(error).toBeDefined();
       }
@@ -123,7 +129,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst = jest.fn().mockReturnValue({ id: 1 });
 
       try {
-        await service.login(userInput);
+        await service.login(userInput, i18n);
       } catch (error) {}
 
       expect(prisma.user.findFirst).toHaveBeenCalledTimes(1);
@@ -137,7 +143,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst = jest.fn().mockReturnValue(null);
 
       try {
-        await service.login(userInput);
+        await service.login(userInput, i18n);
       } catch (error) {
         expect(error).toBeDefined();
         expect(error).toBeInstanceOf(IncorrectCredentialsException);
@@ -151,7 +157,7 @@ describe(`AuthService`, () => {
       jest.mocked(bcrypt.compareSync).mockReturnValue(false);
 
       try {
-        await service.login(userInput);
+        await service.login(userInput, i18n);
       } catch (error) {
         expect(error).toBeDefined();
         expect(error).toBeInstanceOf(IncorrectCredentialsException);
@@ -171,7 +177,7 @@ describe(`AuthService`, () => {
       jest.mocked(bcrypt.compareSync).mockReturnValue(true);
       jwtService.signAccessToken = jest.fn().mockReturnValue(MOCKED_TOKEN);
 
-      const result = await service.login(userInput);
+      const result = await service.login(userInput, i18n);
 
       expect(jwtService.signAccessToken).toHaveBeenCalledTimes(1);
       expect(jwtService.signAccessToken).toHaveBeenCalledWith({

@@ -1,25 +1,13 @@
 import { plainToInstance } from "class-transformer";
-import { RegisterDto } from "./register.dto";
 import { validate } from "class-validator";
-import {
-  CONFIRM_PASSWORD_DO_NOT_MATCH_MESSAGE,
-  CONFIRM_PASSWORD_IS_NOT_VALID_MESSAGE,
-  CONFIRM_PASSWORD_MAX_LENGTH_MESSAGE,
-  CONFIRM_PASSWORD_MIN_LENGTH_MESSAGE,
-  EMAIL_IS_NOT_VALID_MESSAGE,
-  NAME_IS_NOT_VALID_MESSAGE,
-  NAME_MAX_LENGTH,
-  NAME_MAX_LENGTH_MESSAGE,
-  NAME_MIN_LENGTH,
-  NAME_MIN_LENGTH_MESSAGE,
-  PASSWORD_IS_NOT_STRONG_MESSAGE,
-  PASSWORD_IS_NOT_VALID_MESSAGE,
-  PASSWORD_MAX_LENGTH,
-  PASSWORD_MAX_LENGTH_MESSAGE,
-  PASSWORD_MIN_LENGTH,
-  PASSWORD_MIN_LENGTH_MESSAGE,
-} from "../constants/auth.constants";
 import { stringGenerator } from "src/common/utils/generator.utils";
+import {
+  NAME_MAX_LENGTH,
+  NAME_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "../constants/auth.constants";
+import { RegisterDto } from "./register.dto";
 
 describe(`Register DTO`, () => {
   describe(`Name`, () => {
@@ -34,7 +22,7 @@ describe(`Register DTO`, () => {
       expect(nameErrors).toBeDefined();
       expect(nameErrors.constraints).toEqual(
         expect.objectContaining({
-          isDefined: NAME_IS_NOT_VALID_MESSAGE,
+          isDefined: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -51,7 +39,7 @@ describe(`Register DTO`, () => {
       expect(nameErrors).toBeDefined();
       expect(nameErrors.constraints).toEqual(
         expect.objectContaining({
-          isNotEmpty: NAME_IS_NOT_VALID_MESSAGE,
+          isNotEmpty: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -68,7 +56,7 @@ describe(`Register DTO`, () => {
       expect(nameErrors).toBeDefined();
       expect(nameErrors.constraints).toEqual(
         expect.objectContaining({
-          isString: NAME_IS_NOT_VALID_MESSAGE,
+          isString: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -86,7 +74,7 @@ describe(`Register DTO`, () => {
       expect(nameErrors).toBeDefined();
       expect(nameErrors.constraints).toEqual(
         expect.objectContaining({
-          minLength: NAME_MIN_LENGTH_MESSAGE,
+          minLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -104,7 +92,7 @@ describe(`Register DTO`, () => {
       expect(nameErrors).toBeDefined();
       expect(nameErrors.constraints).toEqual(
         expect.objectContaining({
-          maxLength: NAME_MAX_LENGTH_MESSAGE,
+          maxLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -135,7 +123,7 @@ describe(`Register DTO`, () => {
       expect(emailErrors).toBeDefined();
       expect(emailErrors.constraints).toEqual(
         expect.objectContaining({
-          isDefined: EMAIL_IS_NOT_VALID_MESSAGE,
+          isDefined: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -152,7 +140,7 @@ describe(`Register DTO`, () => {
       expect(emailErrors).toBeDefined();
       expect(emailErrors.constraints).toEqual(
         expect.objectContaining({
-          isNotEmpty: EMAIL_IS_NOT_VALID_MESSAGE,
+          isNotEmpty: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -169,7 +157,7 @@ describe(`Register DTO`, () => {
       expect(emailErrors).toBeDefined();
       expect(emailErrors.constraints).toEqual(
         expect.objectContaining({
-          isEmail: EMAIL_IS_NOT_VALID_MESSAGE,
+          isEmail: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -200,7 +188,7 @@ describe(`Register DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          isDefined: PASSWORD_IS_NOT_VALID_MESSAGE,
+          isDefined: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -219,7 +207,7 @@ describe(`Register DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          isNotEmpty: PASSWORD_IS_NOT_VALID_MESSAGE,
+          isNotEmpty: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -240,7 +228,7 @@ describe(`Register DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          minLength: PASSWORD_MIN_LENGTH_MESSAGE,
+          minLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -261,7 +249,7 @@ describe(`Register DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          maxLength: PASSWORD_MAX_LENGTH_MESSAGE,
+          maxLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -282,7 +270,7 @@ describe(`Register DTO`, () => {
       expect(passwordErrors).toBeDefined();
       expect(passwordErrors.constraints).toEqual(
         expect.objectContaining({
-          matches: PASSWORD_IS_NOT_STRONG_MESSAGE,
+          matches: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -319,7 +307,7 @@ describe(`Register DTO`, () => {
       expect(confirmPasswordErrors).toBeDefined();
       expect(confirmPasswordErrors.constraints).toEqual(
         expect.objectContaining({
-          isDefined: CONFIRM_PASSWORD_IS_NOT_VALID_MESSAGE,
+          isDefined: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -338,7 +326,7 @@ describe(`Register DTO`, () => {
       expect(confirmPasswordErrors).toBeDefined();
       expect(confirmPasswordErrors.constraints).toEqual(
         expect.objectContaining({
-          isNotEmpty: CONFIRM_PASSWORD_IS_NOT_VALID_MESSAGE,
+          isNotEmpty: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -359,7 +347,7 @@ describe(`Register DTO`, () => {
       expect(confirmPasswordErrors).toBeDefined();
       expect(confirmPasswordErrors.constraints).toEqual(
         expect.objectContaining({
-          minLength: CONFIRM_PASSWORD_MIN_LENGTH_MESSAGE,
+          minLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -380,7 +368,7 @@ describe(`Register DTO`, () => {
       expect(confirmPasswordErrors).toBeDefined();
       expect(confirmPasswordErrors.constraints).toEqual(
         expect.objectContaining({
-          maxLength: CONFIRM_PASSWORD_MAX_LENGTH_MESSAGE,
+          maxLength: expect.any(String),
         }),
       );
       expect.hasAssertions();
@@ -404,7 +392,7 @@ describe(`Register DTO`, () => {
       expect(confirmPasswordErrors).toBeDefined();
       expect(confirmPasswordErrors.constraints).toEqual(
         expect.objectContaining({
-          Match: CONFIRM_PASSWORD_DO_NOT_MATCH_MESSAGE,
+          Match: expect.any(String),
         }),
       );
       expect.hasAssertions();

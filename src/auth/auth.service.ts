@@ -11,6 +11,8 @@ import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
 import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
 import { IAccessTokenPayload } from "src/config/interfaces/jwt.interface";
+import { I18nContext } from "nestjs-i18n";
+import { I18nTranslations } from "src/generated/i18n.generated";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -21,17 +23,18 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register({
-    email,
-    name,
-    password,
-  }: RegisterDto): Promise<RegisterResponseDto> {
+  async register(
+    { email, name, password }: RegisterDto,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<RegisterResponseDto> {
     const user = await this.prisma.user.findFirst({
       where: { email },
     });
 
     if (user) {
-      throw new UserAlreadyExistsException();
+      throw new UserAlreadyExistsException(
+        i18n.t(`auth.exceptions.userAlreadyExists`),
+      );
     }
 
     const hashedPassword = bcrypt.hashSync(password, PASSWORD_HASH_SALT);
@@ -47,21 +50,28 @@ export class AuthService {
     return { success: true, error: null };
   }
 
-  async login({ email, password }: LoginDto): Promise<LoginResponseDto> {
+  async login(
+    { email, password }: LoginDto,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<LoginResponseDto> {
     const user = await this.prisma.user.findFirst({
       where: { email },
     });
 
+    const INCORRECT_CREDENTIALS_EXCEPTION = i18n.t(
+      `auth.exceptions.incorrectCredentials`,
+    );
+
     // check if user exists
     if (!user) {
-      throw new IncorrectCredentialsException();
+      throw new IncorrectCredentialsException(INCORRECT_CREDENTIALS_EXCEPTION);
     }
 
     // check if password is correct
     const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 
     if (!isPasswordCorrect) {
-      throw new IncorrectCredentialsException();
+      throw new IncorrectCredentialsException(INCORRECT_CREDENTIALS_EXCEPTION);
     }
 
     // create token

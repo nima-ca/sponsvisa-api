@@ -6,10 +6,16 @@ import { RegisterDto } from "./dto/register.dto";
 import { JwtService } from "src/jwt/jwt.service";
 import { ConfigService } from "@nestjs/config";
 import { LoginDto } from "./dto/login.dto";
+import { I18nContext } from "nestjs-i18n";
+import { I18nTranslations } from "src/generated/i18n.generated";
 
 describe(`AuthController`, () => {
   let service: AuthService;
   let controller: AuthController;
+
+  const i18n = {
+    t: jest.fn().mockReturnValue(`random translated text`),
+  } as unknown as I18nContext<I18nTranslations>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,7 +41,7 @@ describe(`AuthController`, () => {
       };
       const result = { success: true, error: null };
       jest.spyOn(service, `register`).mockImplementation(async () => result);
-      expect(await controller.register(mockedRegisterDto)).toBe(result);
+      expect(await controller.register(mockedRegisterDto, i18n)).toBe(result);
     });
   });
 
@@ -47,7 +53,7 @@ describe(`AuthController`, () => {
       };
       const result = { success: true, error: null, token: `some random token` };
       jest.spyOn(service, `login`).mockImplementation(async () => result);
-      expect(await controller.login(mockedLoginDto)).toBe(result);
+      expect(await controller.login(mockedLoginDto, i18n)).toBe(result);
     });
   });
 });

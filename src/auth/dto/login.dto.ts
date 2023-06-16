@@ -7,6 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from "class-validator";
+import { PASSWORD_REGEX } from "src/common/constants/regex.const";
 import { CoreResponseDto } from "src/common/dto/common.dto";
 import {
   EMAIL_IS_NOT_VALID_MESSAGE,
@@ -17,7 +18,6 @@ import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_MIN_LENGTH_MESSAGE,
 } from "../constants/auth.constants";
-import { PASSWORD_REGEX } from "src/common/constants/regex.const";
 
 export class LoginDto {
   @IsDefined({ message: EMAIL_IS_NOT_VALID_MESSAGE })
