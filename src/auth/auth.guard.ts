@@ -56,11 +56,11 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private addUserToRequest(user: User, req: Request) {
+  addUserToRequest(user: User, req: Request) {
     req[AUTH_USER_KEY_IN_REQUEST] = user;
   }
 
-  private async validateRequest(
+  async validateRequest(
     req: Request,
     i18n: I18nContext<I18nTranslations>,
   ): Promise<User | null> {
@@ -81,12 +81,12 @@ export class AuthGuard implements CanActivate {
     return user;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
+  extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(` `) ?? [];
     return type === `Bearer` ? token : undefined;
   }
 
-  private async getUser(id: number): Promise<User> {
+  async getUser(id: number): Promise<User | null> {
     return await this.prisma.user.findFirst({ where: { id } });
   }
 }
