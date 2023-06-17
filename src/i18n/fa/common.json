@@ -1,5 +1,6 @@
 {
   "errors": {
-    "internalServerException": "مشکلی بوجود آمده است"
+    "internalServerException": "مشکلی بوجود آمده است",
+    "userNotVerifiedException": "لطفا ابتدا ایمیل خود را تایید کنید"
   }
 }

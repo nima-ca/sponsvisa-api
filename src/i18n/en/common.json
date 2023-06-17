@@ -1,5 +1,6 @@
 {
   "errors": {
-    "internalServerException": "Something went wrong"
+    "internalServerException": "Something went wrong",
+    "userNotVerifiedException": "Please verify your email address first!"
   }
 }
