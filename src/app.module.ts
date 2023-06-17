@@ -6,6 +6,7 @@ import { validationSchema } from "./config/config.schema";
 import { config } from "./config/config";
 import { PrismaModule } from "./prisma/prisma.module";
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from "nestjs-i18n";
+import { CompanyModule } from "./company/company.module";
 import * as path from "path";
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import * as path from "path";
     AuthModule,
     JwtModule,
     PrismaModule,
+    CompanyModule,
   ],
 })
 export class AppModule {}
