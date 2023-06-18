@@ -62,6 +62,9 @@ export type I18nTranslations = {
                 "notValidError": string;
             };
         };
+        "exceptions": {
+            "companyNotFound": string;
+        };
     };
 };
 export type I18nPath = Path<I18nTranslations>;
