@@ -12,8 +12,8 @@ import {
   ROLE_METADATA_KEY,
   Roles,
 } from "src/common/decorators/setRole.decorator";
-import { IAccessTokenPayload } from "src/config/interfaces/jwt.interface";
-import { I18nTranslations } from "src/generated/i18n.generated";
+import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AUTH_USER_KEY_IN_REQUEST } from "./constants/auth.constants";

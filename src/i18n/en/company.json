@@ -1,0 +1,25 @@
+{
+  "constants": {
+    "name": {
+      "notValidError": "Please enter a valid company name",
+      "maxLengthError": "Company name must be less than {length} characters"
+    },
+    "description": {
+      "notValidError": "Please enter a valid description",
+      "minLengthError": "Description must be at least {length} characters long",
+      "maxLengthError": "Description must be less than {length} characters"
+    },
+    "country": {
+      "notValidError": "Please enter a valid country"
+    },
+    "website": {
+      "notValidError": "Please enter a valid website url"
+    },
+    "linkedin": {
+      "notValidError": "Please enter a valid linkedin url"
+    },
+    "supportsSponsorshipProgram": {
+      "notValidError": "Please select a sponsorship program"
+    }
+  }
+}

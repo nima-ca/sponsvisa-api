@@ -1,5 +1,5 @@
 import { i18nValidationMessage } from "nestjs-i18n";
-import { I18nTranslations } from "src/generated/i18n.generated";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 
 // Name constants
 export const NAME_MIN_LENGTH = 2;

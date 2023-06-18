@@ -37,6 +37,7 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "i18n-iso-countries": "^7.6.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
     "nanoid": "^4.0.2",

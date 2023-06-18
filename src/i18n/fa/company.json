@@ -1,0 +1,25 @@
+{
+  "constants": {
+    "name": {
+      "notValidError": "نام شرکت را به درستی وارد کنید",
+      "maxLengthError": "نام شرکت باید از {length} کاراکتر کمتر باشد"
+    },
+    "description": {
+      "notValidError": "توضیحات شرکت را به درستی وارد کنید",
+      "minLengthError": "توضیحات شرکت باید از {length} کاراکتر بیشتر باشد",
+      "maxLengthError": "توضیحات شرکت باید از {length} کاراکتر کمتر باشد"
+    },
+    "country": {
+      "notValidError": "کشور شرکت را به درستی وارد کنید"
+    },
+    "website": {
+      "notValidError": "آدرس وبسایت شرکت را به درستی وارد کنید"
+    },
+    "linkedin": {
+      "notValidError": "آدرس لینکدین شرکت را به درستی وارد کنید"
+    },
+    "supportsSponsorshipProgram": {
+      "notValidError": "وضعیت ویزا اسپانسرشیپ شرکت را به درستی وارد "
+    }
+  }
+}

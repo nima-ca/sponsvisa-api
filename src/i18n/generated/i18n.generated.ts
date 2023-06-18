@@ -35,6 +35,32 @@ export type I18nTranslations = {
     "common": {
         "errors": {
             "internalServerException": string;
+            "userNotVerifiedException": string;
+        };
+    };
+    "company": {
+        "constants": {
+            "name": {
+                "notValidError": string;
+                "maxLengthError": string;
+            };
+            "description": {
+                "notValidError": string;
+                "minLengthError": string;
+                "maxLengthError": string;
+            };
+            "country": {
+                "notValidError": string;
+            };
+            "website": {
+                "notValidError": string;
+            };
+            "linkedin": {
+                "notValidError": string;
+            };
+            "supportsSponsorshipProgram": {
+                "notValidError": string;
+            };
         };
     };
 };
