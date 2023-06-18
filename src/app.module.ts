@@ -27,7 +27,7 @@ import * as path from "path";
       ],
       typesOutputPath: path.join(
         __dirname,
-        `../src/generated/i18n.generated.ts`,
+        `../src/i18n/generated/i18n.generated.ts`,
       ),
     }),
     AuthModule,

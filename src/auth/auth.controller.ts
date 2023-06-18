@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { I18n, I18nContext } from "nestjs-i18n";
-import { I18nTranslations } from "src/generated/i18n.generated";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { AuthService } from "./auth.service";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";

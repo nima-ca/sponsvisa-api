@@ -9,7 +9,7 @@ import {
   ROLE_METADATA_KEY,
   Roles,
 } from "src/common/decorators/setRole.decorator";
-import { I18nTranslations } from "src/generated/i18n.generated";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthGuard } from "./auth.guard";

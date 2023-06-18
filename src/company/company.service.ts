@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { I18nContext } from "nestjs-i18n";
 import { checkIfUserIsVerified } from "src/common/utils/userVerified";
-import { I18nTranslations } from "src/generated/i18n.generated";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import {
   CreateCompanyDto,
   CreateCompanyResponseDto,
