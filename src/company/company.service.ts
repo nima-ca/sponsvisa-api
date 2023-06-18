@@ -1,15 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { I18nContext } from "nestjs-i18n";
+import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
 import { checkIfUserIsVerified } from "src/common/utils/userVerified";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
+import { PrismaService } from "src/prisma/prisma.service";
 import {
   CreateCompanyDto,
   CreateCompanyResponseDto,
 } from "./dto/create-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
+
 @Injectable()
 export class CompanyService {
   constructor(private readonly prisma: PrismaService) {}

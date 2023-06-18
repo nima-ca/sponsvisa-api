@@ -5,17 +5,17 @@ import { Reflector } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserRole } from "@prisma/client";
 import { I18nContext } from "nestjs-i18n/dist/i18n.context";
+import * as httpMocks from "node-mocks-http";
+import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 import {
   ROLE_METADATA_KEY,
   Roles,
 } from "src/common/decorators/setRole.decorator";
-import { I18nTranslations } from "src/i18n/generated/i18n.generated";
+import { mockI18n } from "src/common/utils/generator.utils";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthGuard } from "./auth.guard";
-import * as httpMocks from "node-mocks-http";
 import { InvalidTokenException } from "./exceptions/invalid-token.exception";
-import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 
 jest.mock(`nestjs-i18n/dist/i18n.context`);
 
@@ -24,9 +24,7 @@ const mockReflector = () => ({
   get: jest.fn((metadataKey: string, target: Function): Roles[] => []),
 });
 
-const i18n = {
-  t: jest.fn().mockReturnValue(`random translated text`),
-} as unknown as I18nContext<I18nTranslations>;
+const i18n = mockI18n();
 
 describe(`AuthGuard`, () => {
   let guard: AuthGuard;
