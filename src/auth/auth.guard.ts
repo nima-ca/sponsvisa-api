@@ -12,7 +12,7 @@ import {
   ROLE_METADATA_KEY,
   Roles,
 } from "src/common/decorators/setRole.decorator";
-import { IAccessTokenPayload } from "src/config/interfaces/jwt.interface";
+import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 import { I18nTranslations } from "src/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";

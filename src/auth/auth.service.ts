@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { I18nContext } from "nestjs-i18n";
-import { IAccessTokenPayload } from "src/config/interfaces/jwt.interface";
+import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 import { I18nTranslations } from "src/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";

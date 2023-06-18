@@ -2,7 +2,7 @@ import { VersioningType } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { I18nValidationExceptionFilter, I18nValidationPipe } from "nestjs-i18n";
 import { AppModule } from "./app.module";
-import { AllExceptionFilter } from "./httpExceptions/http-exception.filter";
+import { AllExceptionFilter } from "./common/httpExceptions/http-exception.filter";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {

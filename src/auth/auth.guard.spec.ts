@@ -15,7 +15,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { AuthGuard } from "./auth.guard";
 import * as httpMocks from "node-mocks-http";
 import { InvalidTokenException } from "./exceptions/invalid-token.exception";
-import { IAccessTokenPayload } from "src/config/interfaces/jwt.interface";
+import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 
 jest.mock(`nestjs-i18n/dist/i18n.context`);
 
