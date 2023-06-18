@@ -77,7 +77,6 @@ export class CreateCompanyDto {
   linkedin: string;
 
   @IsDefined({ message: COMPANY_SPONSORSHIP_IS_NOT_VALID_MESSAGE })
-  @IsNotEmpty({ message: COMPANY_SPONSORSHIP_IS_NOT_VALID_MESSAGE })
   @IsEnum(SponsorshipSupport, {
     message: COMPANY_SPONSORSHIP_IS_NOT_VALID_MESSAGE,
   })
