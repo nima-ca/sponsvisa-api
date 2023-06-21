@@ -11,6 +11,7 @@ import {
 } from "./dto/create-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
 import { FindOneCompanyResponseDto } from "./dto/find-company.dto";
+import { getName } from "i18n-iso-countries";
 
 @Injectable()
 export class CompanyService {
@@ -52,7 +53,10 @@ export class CompanyService {
       throw new BadRequestException(CompanyNotFoundError);
     }
 
-    return { success: true, error: null, company };
+    // get country name by its code
+    const countryName = getName(company.country, i18n.lang);
+
+    return { success: true, error: null, company: { ...company, countryName } };
   }
 
   update(id: number, updateCompanyDto: UpdateCompanyDto) {
