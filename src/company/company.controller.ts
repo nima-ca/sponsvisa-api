@@ -18,8 +18,14 @@ import {
   CreateCompanyResponseDto,
 } from "./dto/create-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
+import { FindOneCompanyResponseDto } from "./dto/find-company.dto";
+import { ApiTags } from "@nestjs/swagger";
 
-@Controller(`company`)
+@ApiTags(`company`)
+@Controller({
+  version: `1`,
+  path: `company`,
+})
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
@@ -39,8 +45,11 @@ export class CompanyController {
   }
 
   @Get(`:id`)
-  findOne(@Param(`id`) id: string) {
-    return this.companyService.findOne(+id);
+  async findOne(
+    @Param(`id`) id: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<FindOneCompanyResponseDto> {
+    return await this.companyService.findOne(+id, i18n);
   }
 
   @Patch(`:id`)

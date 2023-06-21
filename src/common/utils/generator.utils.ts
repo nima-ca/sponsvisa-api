@@ -20,4 +20,5 @@ export const mockUser = (
 export const mockI18n = () =>
   ({
     t: jest.fn().mockReturnValue(`random translated text`),
+    lang: `en`,
   } as unknown as I18nContext<CompanyController>);

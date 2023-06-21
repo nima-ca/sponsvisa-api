@@ -21,5 +21,8 @@
     "supportsSponsorshipProgram": {
       "notValidError": "Please select a sponsorship program"
     }
+  },
+  "exceptions": {
+    "companyNotFound": "Company not found!"
   }
 }
