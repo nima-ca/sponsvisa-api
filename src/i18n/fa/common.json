@@ -2,5 +2,11 @@
   "errors": {
     "internalServerException": "مشکلی بوجود آمده است",
     "userNotVerifiedException": "لطفا ابتدا ایمیل خود را تایید کنید"
+  },
+  "constants": {
+    "isPositive": "باید عدد مثبت باشد {field}",
+    "isInteger": "باید یک عدد صحیح (بدون اعشار) باشد {field}",
+    "limitMaxNumber": "باید حداکثر {max} باشد Limit مقدار",
+    "searchQueryIsString": "مثدار سرچ را به درستی وارد کنید"
   }
 }

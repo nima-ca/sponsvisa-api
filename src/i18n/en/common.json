@@ -2,5 +2,11 @@
   "errors": {
     "internalServerException": "Something went wrong",
     "userNotVerifiedException": "Please verify your email address first!"
+  },
+  "constants": {
+    "isPositive": "{field} must be a positive number.",
+    "isInteger": "{field} must be an integer.",
+    "limitMaxNumber": "Limit must be less than {max}.",
+    "searchQueryIsString": "Enter Search Query in correct format."
   }
 }

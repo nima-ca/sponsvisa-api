@@ -59,3 +59,8 @@ export const COMPANY_SPONSORSHIP_IS_NOT_VALID_MESSAGE =
   i18nValidationMessage<I18nTranslations>(
     `company.constants.supportsSponsorshipProgram.notValidError`,
   );
+
+// find all method
+
+export const COMPANY_FIND_ALL_PAGES_DEFAULT_VALUE = 1;
+export const COMPANY_FIND_ALL_LIMIT_DEFAULT_VALUE = 10;
