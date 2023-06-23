@@ -30,7 +30,7 @@ model Company {
   supportsSponsorshipProgram SponsorshipSupport
   createdAt                  DateTime              @default(now())
   user                       User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId                     Int?                  
+  userId                     Int?
   isApproved                 Boolean               @default(false)
   commentsOnCompanies        CommentsOnCompanies[]
 }
@@ -45,10 +45,10 @@ model CommentsOnCompanies {
   id Int @id @default(autoincrement())
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int  
+  userId Int
 
   company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId  Int     
+  companyId  Int
   isApproved Boolean @default(false)
 }
 
@@ -57,6 +57,14 @@ model Bookmarks {
   userId    Int
   companyId Int
   createdAt DateTime @default(now())
+}
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  body      String
+  url       String
+  method    String
 }
 
 enum UserRole {
