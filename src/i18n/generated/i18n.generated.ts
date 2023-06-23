@@ -67,6 +67,9 @@ export type I18nTranslations = {
             "supportsSponsorshipProgram": {
                 "notValidError": string;
             };
+            "isApproved": {
+                "notValidError": string;
+            };
         };
         "exceptions": {
             "companyNotFound": string;

@@ -23,8 +23,11 @@ import {
   FindAllCompaniesQueryDto,
   FindOneCompanyResponseDto,
 } from "./dto/find-company.dto";
-import { UpdateCompanyDto } from "./dto/update-company.dto";
-import { DeleteCompanyDto } from "./dto/delete-company.dto";
+import {
+  UpdateCompanyDto,
+  UpdateCompanyResponseDto,
+} from "./dto/update-company.dto";
+import { DeleteCompanyResponseDto } from "./dto/delete-company.dto";
 
 @ApiTags(`company`)
 @Controller({
@@ -61,8 +64,13 @@ export class CompanyController {
   }
 
   @Patch(`:id`)
-  update(@Param(`id`) id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companyService.update(+id, updateCompanyDto);
+  @setRole([`ADMIN`])
+  async update(
+    @Param(`id`) id: string,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<UpdateCompanyResponseDto> {
+    return await this.companyService.update(+id, updateCompanyDto, i18n);
   }
 
   @Delete(`:id`)
@@ -70,7 +78,7 @@ export class CompanyController {
   remove(
     @Param(`id`) id: string,
     @I18n() i18n: I18nContext<I18nTranslations>,
-  ): Promise<DeleteCompanyDto> {
+  ): Promise<DeleteCompanyResponseDto> {
     return this.companyService.remove(+id, i18n);
   }
 }
