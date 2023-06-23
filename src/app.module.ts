@@ -14,6 +14,7 @@ import { AcceptLanguageResolver, I18nModule, QueryResolver } from "nestjs-i18n";
 import { CompanyModule } from "./company/company.module";
 import * as path from "path";
 import { AuthMiddleware } from "./auth/auth.middleware";
+import { LoggerMiddleware } from "./common/log/logger.middleware";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,6 +45,7 @@ import { AuthMiddleware } from "./auth/auth.middleware";
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes(`*`);
     consumer.apply(AuthMiddleware).forRoutes(`*`);
   }
 }
