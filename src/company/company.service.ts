@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { User, UserRole } from "@prisma/client";
 import { getName } from "i18n-iso-countries";
 import { I18nContext } from "nestjs-i18n";
 import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
@@ -53,10 +53,16 @@ export class CompanyService {
       limit = COMPANY_FIND_ALL_LIMIT_DEFAULT_VALUE,
       searchQuery = ``,
       country = ``,
+      isApproved,
     }: FindAllCompaniesQueryDto,
     i18n: I18nContext<I18nTranslations>,
+    user: User,
   ): Promise<FindAllCompaniesResponseDto> {
     const skip = (page - 1) * limit;
+
+    const isUserAdmin = user && user.role === UserRole.ADMIN;
+    const isApprovedProvidedByAdmin =
+      isUserAdmin && typeof isApproved !== `undefined`;
 
     const companies = await this.prisma.company.findMany({
       where: {
@@ -67,6 +73,8 @@ export class CompanyService {
           contains: searchQuery,
           mode: `insensitive`,
         },
+        ...(!isUserAdmin && { isApproved: true }),
+        ...(isApprovedProvidedByAdmin && { isApproved }),
       },
       skip,
       take: limit,
@@ -81,6 +89,8 @@ export class CompanyService {
           contains: searchQuery,
           mode: `insensitive`,
         },
+        ...(!isUserAdmin && { isApproved: true }),
+        ...(isApprovedProvidedByAdmin && { isApproved }),
       },
     });
 
@@ -97,10 +107,14 @@ export class CompanyService {
   async findOne(
     id: number,
     i18n: I18nContext<I18nTranslations>,
+    user: User,
   ): Promise<FindOneCompanyResponseDto> {
-    const company = await this.prisma.company.findUnique({
+    const isUserAdmin = user && user.role === UserRole.ADMIN;
+
+    const company = await this.prisma.company.findFirst({
       where: {
         id,
+        ...(!isUserAdmin && { isApproved: true }),
       },
     });
 
@@ -119,11 +133,12 @@ export class CompanyService {
     id: number,
     updateCompanyDto: UpdateCompanyDto,
     i18n: I18nContext<I18nTranslations>,
+    user: User,
   ): Promise<UpdateCompanyResponseDto> {
     const {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       company: { countryName, ...company },
-    } = await this.findOne(id, i18n);
+    } = await this.findOne(id, i18n, user);
 
     await this.prisma.company.update({
       where: { id },
@@ -139,9 +154,10 @@ export class CompanyService {
   async remove(
     id: number,
     i18n: I18nContext<I18nTranslations>,
+    user: User,
   ): Promise<DeleteCompanyResponseDto> {
     // it finds the company or throws an error
-    await this.findOne(id, i18n);
+    await this.findOne(id, i18n, user);
 
     // delete the company
     await this.prisma.company.delete({

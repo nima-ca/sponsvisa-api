@@ -51,16 +51,18 @@ export class CompanyController {
   findAll(
     @Query() query: FindAllCompaniesQueryDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
   ) {
-    return this.companyService.findAll(query, i18n);
+    return this.companyService.findAll(query, i18n, user);
   }
 
   @Get(`:id`)
   async findOne(
     @Param(`id`) id: string,
     @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
   ): Promise<FindOneCompanyResponseDto> {
-    return await this.companyService.findOne(+id, i18n);
+    return await this.companyService.findOne(+id, i18n, user);
   }
 
   @Patch(`:id`)
@@ -69,8 +71,9 @@ export class CompanyController {
     @Param(`id`) id: string,
     @Body() updateCompanyDto: UpdateCompanyDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
   ): Promise<UpdateCompanyResponseDto> {
-    return await this.companyService.update(+id, updateCompanyDto, i18n);
+    return await this.companyService.update(+id, updateCompanyDto, i18n, user);
   }
 
   @Delete(`:id`)
@@ -78,7 +81,8 @@ export class CompanyController {
   remove(
     @Param(`id`) id: string,
     @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
   ): Promise<DeleteCompanyResponseDto> {
-    return this.companyService.remove(+id, i18n);
+    return this.companyService.remove(+id, i18n, user);
   }
 }
