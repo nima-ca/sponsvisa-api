@@ -202,4 +202,20 @@ describe(`CompanyService`, () => {
       });
     });
   });
+
+  describe(`Remove`, () => {
+    const COMPANY_ID = 1;
+    it(`should find the company and delete it`, async () => {
+      service.findOne = jest.fn().mockReturnValue({ id: COMPANY_ID });
+
+      const result = await service.remove(COMPANY_ID, i18n);
+      expect(result).toEqual(CORE_SUCCESS_DTO);
+      expect(service.findOne).toHaveBeenCalledTimes(1);
+      expect(prisma.company.delete).toHaveBeenCalledTimes(1);
+      expect(prisma.company.delete).toHaveBeenCalledWith({
+        where: { id: COMPANY_ID },
+      });
+      expect.hasAssertions();
+    });
+  });
 });
