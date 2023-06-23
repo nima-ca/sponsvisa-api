@@ -8,19 +8,20 @@ datasource db {
 }
 
 model User {
-  id                  Int                   @id @default(autoincrement())
-  name                String
-  role                UserRole              @default(USER)
-  email               String
-  password            String
-  isVerified          Boolean               @default(false)
-  createdAt           DateTime              @default(now())
-  companies           Company[]
-  commentsOnCompanies CommentsOnCompanies[]
+  id         Int       @id @default(autoincrement())
+  name       String
+  role       UserRole  @default(USER)
+  email      String
+  password   String
+  isVerified Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  companies  Company[]
+  votes      Vote[]
+  comments   Comment[]
 }
 
 model Company {
-  id                         Int                   @id @default(autoincrement())
+  id                         Int                @id @default(autoincrement())
   name                       String
   description                String
   country                    String
@@ -28,28 +29,35 @@ model Company {
   website                    String
   linkedIn                   String?
   supportsSponsorshipProgram SponsorshipSupport
-  createdAt                  DateTime              @default(now())
-  user                       User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId                     Int?
-  isApproved                 Boolean               @default(false)
-  commentsOnCompanies        CommentsOnCompanies[]
+  createdAt                  DateTime           @default(now())
+  user                       User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId                     Int?               
+  isApproved                 Boolean            @default(false)
+  comments                   Comment[]
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  text      String
-  createdAt DateTime @default(now())
+  id        Int       @id @default(autoincrement())
+  message   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  parent    Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId  Int?
+  children  Comment[] @relation("ParentChild")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int
+  votes     Vote[]
 }
 
-model CommentsOnCompanies {
-  id Int @id @default(autoincrement())
-
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
-
-  company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId  Int
-  isApproved Boolean @default(false)
+model Vote {
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId Int
+  vote VoteStatus
+  @@id([userId, commentId])
 }
 
 model Bookmarks {
@@ -76,4 +84,9 @@ enum SponsorshipSupport {
   UNKNOWN
   NO
   YES
+}
+
+enum VoteStatus {
+  UpVote
+  DownVote
 }
