@@ -40,4 +40,10 @@ export class PrismaServiceMock {
     count: jest.fn(),
     create: jest.fn(),
   };
+  public log = {
+    findFirst: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+  };
 }
