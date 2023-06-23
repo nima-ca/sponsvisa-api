@@ -13,6 +13,7 @@ import { CompanyService } from "./company.service";
 import { CreateCompanyDto } from "./dto/create-company.dto";
 import { FindAllCompaniesQueryDto } from "./dto/find-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
+import { UserRole } from "@prisma/client";
 
 jest.mock(`i18n-iso-countries`);
 jest.mock(`src/common/utils/userVerified`, () => ({
@@ -81,20 +82,23 @@ describe(`CompanyService`, () => {
     const MOCKED_USER = mockUser();
     it(`should find the company with id`, async () => {
       const MOCKED_COMPANY_ID = 1;
-      prisma.company.findUnique.mockReturnValue({ id: MOCKED_COMPANY_ID });
+      prisma.company.findFirst.mockReturnValue({ id: MOCKED_COMPANY_ID });
 
       await service.findOne(MOCKED_COMPANY_ID, i18n, MOCKED_USER);
 
-      expect(prisma.company.findUnique).toHaveBeenCalledTimes(1);
-      expect(prisma.company.findUnique).toHaveBeenCalledWith({
-        where: { id: MOCKED_COMPANY_ID },
+      expect(prisma.company.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.company.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: MOCKED_COMPANY_ID,
+          ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
+        },
       });
       expect.hasAssertions();
     });
 
     it(`should fail if the company is not found`, async () => {
       const MOCKED_COMPANY_ID = 1;
-      prisma.company.findUnique.mockReturnValue(null);
+      prisma.company.findFirst.mockReturnValue(null);
 
       expect(
         async () => await service.findOne(MOCKED_COMPANY_ID, i18n, MOCKED_USER),
@@ -106,7 +110,7 @@ describe(`CompanyService`, () => {
       const MOCKED_COMPANY_ID = 1;
       const MOCKED_COMPANY_COUNTRY = `US`;
 
-      prisma.company.findUnique.mockReturnValue({
+      prisma.company.findFirst.mockReturnValue({
         id: MOCKED_COMPANY_ID,
         country: MOCKED_COMPANY_COUNTRY,
       });
@@ -122,7 +126,7 @@ describe(`CompanyService`, () => {
       const MOCKED_COMPANY_ID = 1;
       const MOCKED_COMPANY_COUNTRY = `US`;
 
-      prisma.company.findUnique.mockReturnValue({
+      prisma.company.findFirst.mockReturnValue({
         id: MOCKED_COMPANY_ID,
         country: MOCKED_COMPANY_COUNTRY,
       });
@@ -171,6 +175,11 @@ describe(`CompanyService`, () => {
         where: {
           country: { contains: queryDto.country },
           name: { contains: queryDto.searchQuery, mode: `insensitive` },
+          ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
+          ...(MOCKED_USER.role === UserRole.ADMIN &&
+            typeof queryDto.isApproved !== `undefined` && {
+              isApproved: queryDto.isApproved,
+            }),
         },
         skip: 0,
         take: queryDto.limit,
@@ -179,6 +188,11 @@ describe(`CompanyService`, () => {
         where: {
           country: { contains: queryDto.country },
           name: { contains: queryDto.searchQuery, mode: `insensitive` },
+          ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
+          ...(MOCKED_USER.role === UserRole.ADMIN &&
+            typeof queryDto.isApproved !== `undefined` && {
+              isApproved: queryDto.isApproved,
+            }),
         },
       });
       expect.hasAssertions();
