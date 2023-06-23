@@ -30,7 +30,7 @@ model Company {
   supportsSponsorshipProgram SponsorshipSupport
   createdAt                  DateTime              @default(now())
   user                       User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId                     Int?                  @unique
+  userId                     Int?                  
   isApproved                 Boolean               @default(false)
   commentsOnCompanies        CommentsOnCompanies[]
 }
@@ -45,10 +45,10 @@ model CommentsOnCompanies {
   id Int @id @default(autoincrement())
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int  @unique
+  userId Int  
 
   company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId  Int     @unique
+  companyId  Int     
   isApproved Boolean @default(false)
 }
 

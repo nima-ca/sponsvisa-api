@@ -11,7 +11,7 @@ import {
   ROLE_METADATA_KEY,
   Roles,
 } from "src/common/decorators/setRole.decorator";
-import { mockI18n } from "src/common/utils/generator.utils";
+import { PrismaServiceMock, mockI18n } from "src/common/utils/generator.utils";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthGuard } from "./auth.guard";
@@ -29,7 +29,7 @@ const i18n = mockI18n();
 describe(`AuthGuard`, () => {
   let guard: AuthGuard;
   let reflector: Reflector;
-  let prisma: PrismaService;
+  let prisma: PrismaServiceMock;
   let jwtService: JwtService;
 
   beforeEach(async () => {
@@ -40,7 +40,10 @@ describe(`AuthGuard`, () => {
           useValue: mockReflector(),
         },
         AuthGuard,
-        PrismaService,
+        {
+          provide: PrismaService,
+          useClass: PrismaServiceMock, // Use the mock implementation
+        },
         JwtService,
         ConfigService,
       ],
@@ -48,7 +51,9 @@ describe(`AuthGuard`, () => {
 
     guard = module.get<AuthGuard>(AuthGuard);
     reflector = module.get<Reflector>(Reflector);
-    prisma = module.get<PrismaService>(PrismaService);
+    prisma = module.get<PrismaService>(
+      PrismaService,
+    ) as unknown as PrismaServiceMock;
     jwtService = module.get<JwtService>(JwtService);
   });
 
@@ -132,14 +137,14 @@ describe(`AuthGuard`, () => {
   describe(`Get User`, () => {
     it(`should return user if found`, async () => {
       const MOCKED_USER = { id: 1 };
-      prisma.user.findFirst = jest.fn().mockReturnValue(MOCKED_USER);
+      prisma.user.findFirst.mockReturnValue(MOCKED_USER);
 
       expect(await guard.getUser(MOCKED_USER.id)).toBe(MOCKED_USER);
       expect.hasAssertions();
     });
 
     it(`should return null if user is not found`, async () => {
-      prisma.user.findFirst = jest.fn().mockReturnValue(null);
+      prisma.user.findFirst.mockReturnValue(null);
 
       expect(await guard.getUser(1)).toBe(null);
       expect.hasAssertions();

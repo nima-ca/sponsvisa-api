@@ -22,6 +22,7 @@ async function bootstrap() {
     new I18nValidationPipe({
       stopAtFirstError: true,
       forbidUnknownValues: true,
+      transform: true,
     }),
   );
 

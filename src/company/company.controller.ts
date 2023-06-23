@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { User } from "@prisma/client";
 import { I18n, I18nContext } from "nestjs-i18n";
 import { AuthUser } from "src/common/decorators/auth-user.decorator";
@@ -17,9 +19,11 @@ import {
   CreateCompanyDto,
   CreateCompanyResponseDto,
 } from "./dto/create-company.dto";
+import {
+  FindAllCompaniesQueryDto,
+  FindOneCompanyResponseDto,
+} from "./dto/find-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
-import { FindOneCompanyResponseDto } from "./dto/find-company.dto";
-import { ApiTags } from "@nestjs/swagger";
 
 @ApiTags(`company`)
 @Controller({
@@ -40,8 +44,11 @@ export class CompanyController {
   }
 
   @Get()
-  findAll() {
-    return this.companyService.findAll();
+  findAll(
+    @Query() query: FindAllCompaniesQueryDto,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ) {
+    return this.companyService.findAll(query, i18n);
   }
 
   @Get(`:id`)

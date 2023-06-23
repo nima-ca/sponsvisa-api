@@ -37,6 +37,12 @@ export type I18nTranslations = {
             "internalServerException": string;
             "userNotVerifiedException": string;
         };
+        "constants": {
+            "isPositive": string;
+            "isInteger": string;
+            "limitMaxNumber": string;
+            "searchQueryIsString": string;
+        };
     };
     "company": {
         "constants": {
