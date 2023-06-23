@@ -20,6 +20,9 @@
     },
     "supportsSponsorshipProgram": {
       "notValidError": "Please select a sponsorship program"
+    },
+    "isApproved": {
+      "notValidError": "Please select a valid approved status"
     }
   },
   "exceptions": {

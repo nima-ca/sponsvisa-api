@@ -12,6 +12,7 @@ import { CreateCompanyDto } from "./dto/create-company.dto";
 import { BadRequestException } from "@nestjs/common";
 import { getName } from "i18n-iso-countries";
 import { FindAllCompaniesQueryDto } from "./dto/find-company.dto";
+import { UpdateCompanyDto } from "./dto/update-company.dto";
 
 jest.mock(`i18n-iso-countries`);
 jest.mock(`src/common/utils/userVerified`, () => ({
@@ -214,6 +215,41 @@ describe(`CompanyService`, () => {
       expect(prisma.company.delete).toHaveBeenCalledTimes(1);
       expect(prisma.company.delete).toHaveBeenCalledWith({
         where: { id: COMPANY_ID },
+      });
+      expect.hasAssertions();
+    });
+  });
+
+  describe(`Update`, () => {
+    const MOCKED_COMPANY = {
+      id: 1,
+      countryName: `United States`,
+      name: `test`,
+    };
+
+    const UPDATE_COMPANY_DTO: UpdateCompanyDto = {
+      name: `new name`,
+    };
+
+    it(`should find the company and update it`, async () => {
+      service.findOne = jest.fn().mockReturnValue({ company: MOCKED_COMPANY });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { countryName, ...COMPANY } = MOCKED_COMPANY;
+
+      const result = await service.update(
+        MOCKED_COMPANY.id,
+        UPDATE_COMPANY_DTO,
+        i18n,
+      );
+      expect(result).toEqual(CORE_SUCCESS_DTO);
+      expect(service.findOne).toHaveBeenCalledTimes(1);
+      expect(prisma.company.update).toHaveBeenCalledTimes(1);
+      expect(prisma.company.update).toHaveBeenCalledWith({
+        where: { id: MOCKED_COMPANY.id },
+        data: {
+          ...COMPANY,
+          ...UPDATE_COMPANY_DTO,
+        },
       });
       expect.hasAssertions();
     });

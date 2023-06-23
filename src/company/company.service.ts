@@ -20,8 +20,11 @@ import {
   FindAllCompaniesResponseDto,
   FindOneCompanyResponseDto,
 } from "./dto/find-company.dto";
-import { UpdateCompanyDto } from "./dto/update-company.dto";
-import { DeleteCompanyDto } from "./dto/delete-company.dto";
+import {
+  UpdateCompanyDto,
+  UpdateCompanyResponseDto,
+} from "./dto/update-company.dto";
+import { DeleteCompanyResponseDto } from "./dto/delete-company.dto";
 
 @Injectable()
 export class CompanyService {
@@ -112,14 +115,31 @@ export class CompanyService {
     return { success: true, error: null, company: { ...company, countryName } };
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(
+    id: number,
+    updateCompanyDto: UpdateCompanyDto,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<UpdateCompanyResponseDto> {
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      company: { countryName, ...company },
+    } = await this.findOne(id, i18n);
+
+    await this.prisma.company.update({
+      where: { id },
+      data: {
+        ...company,
+        ...updateCompanyDto,
+      },
+    });
+
+    return CORE_SUCCESS_DTO;
   }
 
   async remove(
     id: number,
     i18n: I18nContext<I18nTranslations>,
-  ): Promise<DeleteCompanyDto> {
+  ): Promise<DeleteCompanyResponseDto> {
     // it finds the company or throws an error
     await this.findOne(id, i18n);
 

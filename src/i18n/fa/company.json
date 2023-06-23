@@ -20,6 +20,9 @@
     },
     "supportsSponsorshipProgram": {
       "notValidError": "وضعیت ویزا اسپانسرشیپ شرکت را به درستی وارد "
+    },
+    "isApproved": {
+      "notValidError": "وضعیت تایید شرکت را به درستی وارد کنید"
     }
   },
   "exceptions": {

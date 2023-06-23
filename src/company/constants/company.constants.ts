@@ -54,10 +54,16 @@ export const COMPANY_LINKEDIN_IS_NOT_VALID_MESSAGE =
     `company.constants.linkedin.notValidError`,
   );
 
-// Company Linkedin
+// Company Sponsorship
 export const COMPANY_SPONSORSHIP_IS_NOT_VALID_MESSAGE =
   i18nValidationMessage<I18nTranslations>(
     `company.constants.supportsSponsorshipProgram.notValidError`,
+  );
+
+// Company Sponsorship
+export const COMPANY_IS_APPROVED_IS_NOT_VALID_MESSAGE =
+  i18nValidationMessage<I18nTranslations>(
+    `company.constants.isApproved.notValidError`,
   );
 
 // find all method
