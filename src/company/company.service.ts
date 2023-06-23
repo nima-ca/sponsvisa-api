@@ -120,15 +120,15 @@ export class CompanyService {
     updateCompanyDto: UpdateCompanyDto,
     i18n: I18nContext<I18nTranslations>,
   ): Promise<UpdateCompanyResponseDto> {
-    const { company } = await this.findOne(id, i18n);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { countryName, ...companyWithoutCountryName } = company;
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      company: { countryName, ...company },
+    } = await this.findOne(id, i18n);
 
     await this.prisma.company.update({
       where: { id },
       data: {
-        ...companyWithoutCountryName,
+        ...company,
         ...updateCompanyDto,
       },
     });
