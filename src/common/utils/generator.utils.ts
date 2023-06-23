@@ -32,6 +32,7 @@ export class PrismaServiceMock {
     create: jest.fn(),
     delete: jest.fn(),
     update: jest.fn(),
+    findFirst: jest.fn(),
   };
   public user = {
     findFirst: jest.fn(),

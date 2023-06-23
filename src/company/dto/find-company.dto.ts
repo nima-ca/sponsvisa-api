@@ -1,4 +1,5 @@
 import { Company } from "@prisma/client";
+import { Transform } from "class-transformer";
 import { IsOptional } from "class-validator";
 import {
   CoreResponseDto,
@@ -16,7 +17,11 @@ export class FindOneCompanyResponseDto extends CoreResponseDto {
 
 export class FindAllCompaniesQueryDto extends PaginationQueryWithSearchDto {
   @IsOptional()
-  country: string;
+  country?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => value === `true`)
+  isApproved?: boolean;
 }
 
 export type CompanyWithCompanyName = Company & {

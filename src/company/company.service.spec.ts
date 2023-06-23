@@ -1,4 +1,6 @@
+import { BadRequestException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+import { getName } from "i18n-iso-countries";
 import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
 import {
   PrismaServiceMock,
@@ -9,10 +11,9 @@ import { checkIfUserIsVerified } from "src/common/utils/userVerified";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CompanyService } from "./company.service";
 import { CreateCompanyDto } from "./dto/create-company.dto";
-import { BadRequestException } from "@nestjs/common";
-import { getName } from "i18n-iso-countries";
 import { FindAllCompaniesQueryDto } from "./dto/find-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
+import { UserRole } from "@prisma/client";
 
 jest.mock(`i18n-iso-countries`);
 jest.mock(`src/common/utils/userVerified`, () => ({
@@ -78,25 +79,29 @@ describe(`CompanyService`, () => {
   });
 
   describe(`Find One`, () => {
+    const MOCKED_USER = mockUser();
     it(`should find the company with id`, async () => {
       const MOCKED_COMPANY_ID = 1;
-      prisma.company.findUnique.mockReturnValue({ id: MOCKED_COMPANY_ID });
+      prisma.company.findFirst.mockReturnValue({ id: MOCKED_COMPANY_ID });
 
-      await service.findOne(MOCKED_COMPANY_ID, i18n);
+      await service.findOne(MOCKED_COMPANY_ID, i18n, MOCKED_USER);
 
-      expect(prisma.company.findUnique).toHaveBeenCalledTimes(1);
-      expect(prisma.company.findUnique).toHaveBeenCalledWith({
-        where: { id: MOCKED_COMPANY_ID },
+      expect(prisma.company.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.company.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: MOCKED_COMPANY_ID,
+          ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
+        },
       });
       expect.hasAssertions();
     });
 
     it(`should fail if the company is not found`, async () => {
       const MOCKED_COMPANY_ID = 1;
-      prisma.company.findUnique.mockReturnValue(null);
+      prisma.company.findFirst.mockReturnValue(null);
 
       expect(
-        async () => await service.findOne(MOCKED_COMPANY_ID, i18n),
+        async () => await service.findOne(MOCKED_COMPANY_ID, i18n, MOCKED_USER),
       ).rejects.toThrow(BadRequestException);
       expect.hasAssertions();
     });
@@ -105,14 +110,14 @@ describe(`CompanyService`, () => {
       const MOCKED_COMPANY_ID = 1;
       const MOCKED_COMPANY_COUNTRY = `US`;
 
-      prisma.company.findUnique.mockReturnValue({
+      prisma.company.findFirst.mockReturnValue({
         id: MOCKED_COMPANY_ID,
         country: MOCKED_COMPANY_COUNTRY,
       });
 
       jest.mocked(getName).mockReturnValue(`United States`);
 
-      await service.findOne(MOCKED_COMPANY_ID, i18n);
+      await service.findOne(MOCKED_COMPANY_ID, i18n, MOCKED_USER);
       expect(getName).toHaveBeenCalled();
       expect(getName).toHaveBeenCalledWith(MOCKED_COMPANY_COUNTRY, i18n.lang);
     });
@@ -121,20 +126,25 @@ describe(`CompanyService`, () => {
       const MOCKED_COMPANY_ID = 1;
       const MOCKED_COMPANY_COUNTRY = `US`;
 
-      prisma.company.findUnique.mockReturnValue({
+      prisma.company.findFirst.mockReturnValue({
         id: MOCKED_COMPANY_ID,
         country: MOCKED_COMPANY_COUNTRY,
       });
 
       jest.mocked(getName).mockReturnValue(`United States`);
 
-      const result = await service.findOne(MOCKED_COMPANY_ID, i18n);
+      const result = await service.findOne(
+        MOCKED_COMPANY_ID,
+        i18n,
+        MOCKED_USER,
+      );
       expect(result.success).toBe(true);
       expect.hasAssertions();
     });
   });
 
   describe(`Find All`, () => {
+    const MOCKED_USER = mockUser();
     const getNameResult = `United States`;
     jest.mocked(getName).mockReturnValue(getNameResult);
 
@@ -156,7 +166,7 @@ describe(`CompanyService`, () => {
       prisma.company.findMany.mockResolvedValue(companies);
       prisma.company.count.mockResolvedValue(totalCount);
 
-      await service.findAll(queryDto, i18n);
+      await service.findAll(queryDto, i18n, MOCKED_USER);
 
       expect(prisma.company.findMany).toHaveBeenCalledTimes(1);
       expect(prisma.company.count).toHaveBeenCalledTimes(1);
@@ -165,6 +175,11 @@ describe(`CompanyService`, () => {
         where: {
           country: { contains: queryDto.country },
           name: { contains: queryDto.searchQuery, mode: `insensitive` },
+          ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
+          ...(MOCKED_USER.role === UserRole.ADMIN &&
+            typeof queryDto.isApproved !== `undefined` && {
+              isApproved: queryDto.isApproved,
+            }),
         },
         skip: 0,
         take: queryDto.limit,
@@ -173,6 +188,11 @@ describe(`CompanyService`, () => {
         where: {
           country: { contains: queryDto.country },
           name: { contains: queryDto.searchQuery, mode: `insensitive` },
+          ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
+          ...(MOCKED_USER.role === UserRole.ADMIN &&
+            typeof queryDto.isApproved !== `undefined` && {
+              isApproved: queryDto.isApproved,
+            }),
         },
       });
       expect.hasAssertions();
@@ -182,7 +202,7 @@ describe(`CompanyService`, () => {
       prisma.company.findMany.mockResolvedValue(companies);
       prisma.company.count.mockResolvedValue(totalCount);
 
-      await service.findAll(queryDto, i18n);
+      await service.findAll(queryDto, i18n, MOCKED_USER);
 
       expect(getName).toHaveBeenCalledTimes(companies.length);
       expect.hasAssertions();
@@ -192,7 +212,7 @@ describe(`CompanyService`, () => {
       prisma.company.findMany.mockResolvedValue(companies);
       prisma.company.count.mockResolvedValue(totalCount);
 
-      const result = await service.findAll(queryDto, i18n);
+      const result = await service.findAll(queryDto, i18n, MOCKED_USER);
       expect(result).toEqual({
         ...CORE_SUCCESS_DTO,
         items: companies.map((company) => ({
@@ -205,11 +225,13 @@ describe(`CompanyService`, () => {
   });
 
   describe(`Remove`, () => {
+    const MOCKED_USER = mockUser();
+
     const COMPANY_ID = 1;
     it(`should find the company and delete it`, async () => {
       service.findOne = jest.fn().mockReturnValue({ id: COMPANY_ID });
 
-      const result = await service.remove(COMPANY_ID, i18n);
+      const result = await service.remove(COMPANY_ID, i18n, MOCKED_USER);
       expect(result).toEqual(CORE_SUCCESS_DTO);
       expect(service.findOne).toHaveBeenCalledTimes(1);
       expect(prisma.company.delete).toHaveBeenCalledTimes(1);
@@ -221,6 +243,8 @@ describe(`CompanyService`, () => {
   });
 
   describe(`Update`, () => {
+    const MOCKED_USER = mockUser();
+
     const MOCKED_COMPANY = {
       id: 1,
       countryName: `United States`,
@@ -240,6 +264,7 @@ describe(`CompanyService`, () => {
         MOCKED_COMPANY.id,
         UPDATE_COMPANY_DTO,
         i18n,
+        MOCKED_USER,
       );
       expect(result).toEqual(CORE_SUCCESS_DTO);
       expect(service.findOne).toHaveBeenCalledTimes(1);

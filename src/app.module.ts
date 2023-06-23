@@ -1,4 +1,9 @@
-import { Module } from "@nestjs/common";
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from "@nestjs/common";
 import { AuthModule } from "./auth/auth.module";
 import { JwtModule } from "./jwt/jwt.module";
 import { ConfigModule } from "@nestjs/config";
@@ -8,6 +13,7 @@ import { PrismaModule } from "./prisma/prisma.module";
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from "nestjs-i18n";
 import { CompanyModule } from "./company/company.module";
 import * as path from "path";
+import { AuthMiddleware } from "./auth/auth.middleware";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,4 +42,8 @@ import * as path from "path";
     CompanyModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes(`*`);
+  }
+}

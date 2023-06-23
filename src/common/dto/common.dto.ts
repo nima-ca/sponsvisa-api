@@ -38,11 +38,11 @@ export class PaginationQueryDto {
 export class PaginationQueryWithSearchDto extends PaginationQueryDto {
   @IsOptional()
   @IsString({ message: QUERY_SEARCH_IS_STRING_MESSAGE_DTO })
-  searchQuery: string;
+  searchQuery?: string;
 }
 
 export class SearchQueryDto {
   @IsOptional()
   @IsString({ message: QUERY_SEARCH_IS_STRING_MESSAGE_DTO })
-  searchQuery: string;
+  searchQuery?: string;
 }
