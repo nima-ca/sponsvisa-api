@@ -24,6 +24,7 @@ import {
   FindOneCompanyResponseDto,
 } from "./dto/find-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
+import { DeleteCompanyDto } from "./dto/delete-company.dto";
 
 @ApiTags(`company`)
 @Controller({
@@ -65,7 +66,11 @@ export class CompanyController {
   }
 
   @Delete(`:id`)
-  remove(@Param(`id`) id: string) {
-    return this.companyService.remove(+id);
+  @setRole([`ADMIN`])
+  remove(
+    @Param(`id`) id: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<DeleteCompanyDto> {
+    return this.companyService.remove(+id, i18n);
   }
 }
