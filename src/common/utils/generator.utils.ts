@@ -22,3 +22,13 @@ export const mockI18n = () =>
     t: jest.fn().mockReturnValue(`random translated text`),
     lang: `en`,
   } as unknown as I18nContext<CompanyController>);
+
+export class PrismaServiceMock {
+  // Define mock methods and properties that you need for testing
+  public company = {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+  };
+}

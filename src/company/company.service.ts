@@ -16,6 +16,7 @@ import {
 } from "./dto/create-company.dto";
 import {
   CompanyWithCompanyName,
+  FindAllCompaniesQueryDto,
   FindAllCompaniesResponseDto,
   FindOneCompanyResponseDto,
 } from "./dto/find-company.dto";
@@ -30,20 +31,16 @@ export class CompanyService {
     user: User,
     I18n: I18nContext<I18nTranslations>,
   ): Promise<CreateCompanyResponseDto> {
-    try {
-      checkIfUserIsVerified(user, I18n);
+    checkIfUserIsVerified(user, I18n);
 
-      await this.prisma.company.create({
-        data: {
-          ...createCompanyDto,
-          userId: user.id,
-        },
-      });
+    await this.prisma.company.create({
+      data: {
+        ...createCompanyDto,
+        userId: user.id,
+      },
+    });
 
-      return CORE_SUCCESS_DTO;
-    } catch (error) {
-      console.log(error);
-    }
+    return CORE_SUCCESS_DTO;
   }
 
   async findAll(
@@ -52,7 +49,7 @@ export class CompanyService {
       limit = COMPANY_FIND_ALL_LIMIT_DEFAULT_VALUE,
       searchQuery = ``,
       country = ``,
-    },
+    }: FindAllCompaniesQueryDto,
     i18n: I18nContext<I18nTranslations>,
   ): Promise<FindAllCompaniesResponseDto> {
     const skip = (page - 1) * limit;
