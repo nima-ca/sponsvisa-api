@@ -32,6 +32,24 @@ export type I18nTranslations = {
             "notAuthorized": string;
         };
     };
+    "comment": {
+        "constants": {
+            "message": {
+                "isNotValidError": string;
+                "maxLengthError": string;
+            };
+            "parentId": {
+                "isNotValidError": string;
+            };
+            "companyId": {
+                "isNotValidError": string;
+            };
+        };
+        "exceptions": {
+            "companyNotFound": string;
+            "commentNotFound": string;
+        };
+    };
     "common": {
         "errors": {
             "internalServerException": string;

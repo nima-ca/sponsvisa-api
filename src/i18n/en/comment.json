@@ -1,0 +1,18 @@
+{
+  "constants": {
+    "message": {
+      "isNotValidError": "Comment Message is not valid",
+      "maxLengthError": "Comment Message must be less than {max} characters"
+    },
+    "parentId": {
+      "isNotValidError": "Parent Id is not valid"
+    },
+    "companyId": {
+      "isNotValidError": "Company Id is not valid"
+    }
+  },
+  "exceptions": {
+    "companyNotFound": "Company is not found!",
+    "commentNotFound": "Replied comment is not found!"
+  }
+}

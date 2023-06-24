@@ -15,7 +15,7 @@ import { CompanyModule } from "./company/company.module";
 import * as path from "path";
 import { AuthMiddleware } from "./auth/auth.middleware";
 import { LoggerMiddleware } from "./common/log/logger.middleware";
-import { CommentModule } from './comment/comment.module';
+import { CommentModule } from "./comment/comment.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
