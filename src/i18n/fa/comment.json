@@ -1,0 +1,18 @@
+{
+  "constants": {
+    "message": {
+      "isNotValidError": "کامنت را به درستی وارد کنید",
+      "maxLengthError": "کامنت باید کمتر از {max} کاراکتر باشد"
+    },
+    "parentId": {
+      "isNotValidError": "را به درستی وارد کنید Parent Id"
+    },
+    "companyId": {
+      "isNotValidError": "را به درستی وارد کنید Company Id"
+    }
+  },
+  "exceptions": {
+    "companyNotFound": "شرکت یافت نشد!",
+    "commentNotFound": "کامنت یافت نشد!"
+  }
+}
