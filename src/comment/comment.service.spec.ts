@@ -28,10 +28,11 @@ describe(`CommentService`, () => {
       ],
     }).compile();
 
+    service = module.get<CommentService>(CommentService);
     prisma = module.get<PrismaService>(
       PrismaService,
     ) as unknown as PrismaServiceMock;
-    service = module.get<CommentService>(CommentService);
+    jest.clearAllMocks();
   });
 
   it(`should be defined`, () => {
@@ -40,10 +41,25 @@ describe(`CommentService`, () => {
 
   describe(`Create`, () => {
     const MOCKED_DTO: CreateCommentDto = {
-      companyId: 1,
-      parentId: 1,
+      companyId: 50,
+      parentId: 90,
       message: `Hello`,
     };
+
+    it(`should check for parentId if exists in dto and throw error if not found`, async () => {
+      prisma.company.findFirst.mockReturnValue({ id: MOCKED_DTO.companyId });
+      prisma.comment.findFirst.mockReturnValue(null);
+
+      await expect(
+        service.create(MOCKED_DTO, i18n, MOCKED_USER),
+      ).rejects.toThrowError(BadRequestException);
+
+      expect(prisma.comment.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.comment.findFirst).toHaveBeenCalledWith({
+        where: { id: MOCKED_DTO.parentId },
+      });
+      expect.hasAssertions();
+    });
 
     it(`should check for company and throw error if it is not found`, () => {
       prisma.company.findFirst.mockReturnValue(null);
@@ -55,21 +71,6 @@ describe(`CommentService`, () => {
       expect(prisma.company.findFirst).toHaveBeenCalledTimes(1);
       expect(prisma.company.findFirst).toHaveBeenCalledWith({
         where: { id: MOCKED_DTO.companyId },
-      });
-      expect.hasAssertions();
-    });
-
-    it(`should check for parentId if exists in dto and throw error if not found`, () => {
-      prisma.company.findFirst.mockReturnValue({ id: MOCKED_DTO.companyId });
-      prisma.comment.findFirst.mockReturnValue(null);
-
-      expect(
-        async () => await service.create(MOCKED_DTO, i18n, MOCKED_USER),
-      ).rejects.toThrowError(BadRequestException);
-
-      expect(prisma.comment.findFirst).toHaveBeenCalled();
-      expect(prisma.comment.findFirst).toHaveBeenCalledWith({
-        where: { id: MOCKED_DTO.parentId },
       });
       expect.hasAssertions();
     });
