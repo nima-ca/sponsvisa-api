@@ -2,7 +2,6 @@ import {
   IsDefined,
   IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   MaxLength,

@@ -35,15 +35,30 @@ export class PrismaServiceMock {
     findFirst: jest.fn(),
   };
   public user = {
-    findFirst: jest.fn(),
+    findUnique: jest.fn(),
     findMany: jest.fn(),
     count: jest.fn(),
     create: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+    findFirst: jest.fn(),
   };
   public log = {
-    findFirst: jest.fn(),
+    findUnique: jest.fn(),
     findMany: jest.fn(),
     count: jest.fn(),
     create: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+    findFirst: jest.fn(),
+  };
+  public comment = {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+    findFirst: jest.fn(),
   };
 }
