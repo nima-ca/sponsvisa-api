@@ -44,6 +44,9 @@ export type I18nTranslations = {
             "companyId": {
                 "isNotValidError": string;
             };
+            "isApproved": {
+                "isNotValidError": string;
+            };
         };
         "exceptions": {
             "companyNotFound": string;

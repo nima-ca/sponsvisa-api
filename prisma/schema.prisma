@@ -31,32 +31,34 @@ model Company {
   supportsSponsorshipProgram SponsorshipSupport
   createdAt                  DateTime           @default(now())
   user                       User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId                     Int?               
+  userId                     Int?
   isApproved                 Boolean            @default(false)
   comments                   Comment[]
 }
 
 model Comment {
-  id        Int       @id @default(autoincrement())
-  message   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  parent    Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
-  parentId  Int?
-  children  Comment[] @relation("ParentChild")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId Int
-  votes     Vote[]
+  id         Int       @id @default(autoincrement())
+  message    String
+  isApproved Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  parent     Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId   Int?
+  children   Comment[] @relation("ParentChild")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId  Int
+  votes      Vote[]
 }
 
 model Vote {
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  comment   Comment    @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId Int
-  vote VoteStatus
+  vote      VoteStatus
+
   @@id([userId, commentId])
 }
 

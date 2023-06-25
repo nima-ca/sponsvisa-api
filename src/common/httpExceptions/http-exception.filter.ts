@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { Response } from "express";
 import { I18nContext } from "nestjs-i18n";
@@ -12,25 +13,28 @@ import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const status = exception.getStatus();
+    const i18n = I18nContext.current<I18nTranslations>();
+    const internalServerError = i18n.t(`common.errors.internalServerException`);
 
-    const resObj: CoreResponseDto = {
-      success: false,
-      error: [exception.message],
-    };
+    try {
+      const ctx = host.switchToHttp();
+      const response = ctx.getResponse<Response>();
+      const status = exception.getStatus();
 
-    if (status.toString().startsWith(`5`)) {
-      const i18n = I18nContext.current<I18nTranslations>();
-      const internalServerError = i18n.t(
-        `common.errors.internalServerException`,
-      );
-      resObj.error = [internalServerError];
+      const resObj: CoreResponseDto = {
+        success: false,
+        error: [exception.message],
+      };
+
+      if (status.toString().startsWith(`5`)) {
+        resObj.error = [internalServerError];
+        response.status(status).json(resObj);
+        return;
+      }
+
       response.status(status).json(resObj);
-      return;
+    } catch (error) {
+      new InternalServerErrorException(internalServerError);
     }
-
-    response.status(status).json(resObj);
   }
 }

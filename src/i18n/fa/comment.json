@@ -9,6 +9,9 @@
     },
     "companyId": {
       "isNotValidError": "را به درستی وارد کنید Company Id"
+    },
+    "isApproved": {
+      "isNotValidError": "وضعیت کامنت را به درستی وارد کنید"
     }
   },
   "exceptions": {

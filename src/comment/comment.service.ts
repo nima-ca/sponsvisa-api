@@ -3,7 +3,10 @@ import {
   CreateCommentDto,
   CreateCommentResponseDto,
 } from "./dto/create-comment.dto";
-import { UpdateCommentDto } from "./dto/update-comment.dto";
+import {
+  UpdateCommentDto,
+  UpdateCommentResponseDto,
+} from "./dto/update-comment.dto";
 import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { User } from "@prisma/client";
@@ -61,8 +64,34 @@ export class CommentService {
     return `This action returns a #${id} comment`;
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  async update(
+    id: number,
+    updateCommentDto: UpdateCommentDto,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<UpdateCommentResponseDto> {
+    try {
+      const comment = await this.prisma.comment.findFirst({
+        where: { id },
+      });
+
+      if (!comment) {
+        throw new BadRequestException(
+          i18n.t(`comment.exceptions.commentNotFound`),
+        );
+      }
+
+      await this.prisma.comment.update({
+        where: { id },
+        data: {
+          ...comment,
+          ...updateCommentDto,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    return CORE_SUCCESS_DTO;
   }
 
   remove(id: number) {
