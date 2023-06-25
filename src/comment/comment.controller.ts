@@ -18,6 +18,7 @@ import { I18n, I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { User } from "@prisma/client";
 import { setRole } from "src/common/decorators/setRole.decorator";
+import { DeleteCommentResponseDto } from "./dto/delete-comment.dto";
 
 @Controller({
   version: `1`,
@@ -48,16 +49,20 @@ export class CommentController {
 
   @Patch(`:id`)
   @setRole([`ADMIN`])
-  async update(
+  update(
     @Param(`id`) id: string,
     @Body() updateCommentDto: UpdateCommentDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<UpdateCommentResponseDto> {
-    return await this.commentService.update(+id, updateCommentDto, i18n);
+    return this.commentService.update(+id, updateCommentDto, i18n);
   }
 
   @Delete(`:id`)
-  remove(@Param(`id`) id: string) {
-    return this.commentService.remove(+id);
+  @setRole([`ADMIN`])
+  remove(
+    @Param(`id`) id: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<DeleteCommentResponseDto> {
+    return this.commentService.remove(+id, i18n);
   }
 }

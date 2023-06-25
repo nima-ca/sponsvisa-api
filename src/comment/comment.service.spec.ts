@@ -139,4 +139,31 @@ describe(`CommentService`, () => {
       ).rejects.toThrowError(BadRequestException);
     });
   });
+
+  describe(`Remove`, () => {
+    it(`should remove a comment and return Success`, async () => {
+      const id = 1;
+      const comment = { id: 1 };
+
+      prisma.comment.findFirst.mockResolvedValue(comment);
+
+      const result = await service.remove(id, i18n);
+
+      expect(prisma.comment.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.comment.findFirst).toHaveBeenCalledWith({ where: { id } });
+      expect(prisma.comment.delete).toHaveBeenCalledTimes(1);
+      expect(prisma.comment.delete).toHaveBeenCalledWith({ where: { id } });
+      expect(result).toEqual(CORE_SUCCESS_DTO);
+    });
+
+    it(`should throw Error if comment is not found`, async () => {
+      const id = 1;
+      prisma.comment.findFirst.mockResolvedValue(null);
+
+      await expect(service.remove(id, i18n)).rejects.toThrowError(
+        BadRequestException,
+      );
+      expect(prisma.comment.findFirst).toHaveBeenCalledWith({ where: { id } });
+    });
+  });
 });

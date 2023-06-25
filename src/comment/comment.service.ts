@@ -12,6 +12,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { User } from "@prisma/client";
 import { I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
+import { DeleteCommentResponseDto } from "./dto/delete-comment.dto";
 
 @Injectable()
 export class CommentService {
@@ -89,7 +90,24 @@ export class CommentService {
     return CORE_SUCCESS_DTO;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async remove(
+    id: number,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<DeleteCommentResponseDto> {
+    const comment = await this.prisma.comment.findFirst({
+      where: { id },
+    });
+
+    if (!comment) {
+      throw new BadRequestException(
+        i18n.t(`comment.exceptions.commentNotFound`),
+      );
+    }
+
+    await this.prisma.comment.delete({
+      where: { id },
+    });
+
+    return CORE_SUCCESS_DTO;
   }
 }
