@@ -19,6 +19,16 @@ export class CommentService {
     i18n: I18nContext<I18nTranslations>,
     user: User,
   ): Promise<CreateCommentResponseDto> {
+    const company = await this.prisma.company.findFirst({
+      where: { id: companyId },
+    });
+
+    if (!company) {
+      throw new BadRequestException(
+        i18n.t(`comment.exceptions.companyNotFound`),
+      );
+    }
+
     if (parentId) {
       const parentComment = await this.prisma.comment.findFirst({
         where: { id: parentId },
@@ -29,16 +39,6 @@ export class CommentService {
           i18n.t(`comment.exceptions.commentNotFound`),
         );
       }
-    }
-
-    const company = await this.prisma.company.findFirst({
-      where: { id: companyId },
-    });
-
-    if (!company) {
-      throw new BadRequestException(
-        i18n.t(`comment.exceptions.companyNotFound`),
-      );
     }
 
     await this.prisma.comment.create({

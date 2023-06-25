@@ -23,27 +23,20 @@ export const mockI18n = () =>
     lang: `en`,
   } as unknown as I18nContext<CompanyController>);
 
+const prismaActions = {
+  findUnique: jest.fn(),
+  findMany: jest.fn(),
+  count: jest.fn(),
+  create: jest.fn(),
+  delete: jest.fn(),
+  update: jest.fn(),
+  findFirst: jest.fn(),
+};
+
 export class PrismaServiceMock {
   // Define mock methods and properties that you need for testing
-  public company = {
-    findUnique: jest.fn(),
-    findMany: jest.fn(),
-    count: jest.fn(),
-    create: jest.fn(),
-    delete: jest.fn(),
-    update: jest.fn(),
-    findFirst: jest.fn(),
-  };
-  public user = {
-    findFirst: jest.fn(),
-    findMany: jest.fn(),
-    count: jest.fn(),
-    create: jest.fn(),
-  };
-  public log = {
-    findFirst: jest.fn(),
-    findMany: jest.fn(),
-    count: jest.fn(),
-    create: jest.fn(),
-  };
+  public company = prismaActions;
+  public user = prismaActions;
+  public log = prismaActions;
+  public comment = prismaActions;
 }
