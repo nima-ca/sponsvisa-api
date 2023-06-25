@@ -9,7 +9,10 @@ import {
 } from "@nestjs/common";
 import { CommentService } from "./comment.service";
 import { CreateCommentDto } from "./dto/create-comment.dto";
-import { UpdateCommentDto } from "./dto/update-comment.dto";
+import {
+  UpdateCommentDto,
+  UpdateCommentResponseDto,
+} from "./dto/update-comment.dto";
 import { AuthUser } from "src/common/decorators/auth-user.decorator";
 import { I18n, I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
@@ -44,8 +47,13 @@ export class CommentController {
   }
 
   @Patch(`:id`)
-  update(@Param(`id`) id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
+  @setRole([`ADMIN`])
+  async update(
+    @Param(`id`) id: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<UpdateCommentResponseDto> {
+    return await this.commentService.update(+id, updateCommentDto, i18n);
   }
 
   @Delete(`:id`)

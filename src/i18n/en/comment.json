@@ -9,6 +9,9 @@
     },
     "companyId": {
       "isNotValidError": "Company Id is not valid"
+    },
+    "isApproved": {
+      "isNotValidError": "Please enter a valid approved status"
     }
   },
   "exceptions": {
