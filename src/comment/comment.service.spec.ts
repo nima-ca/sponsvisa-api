@@ -9,6 +9,7 @@ import {
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { BadRequestException } from "@nestjs/common";
 import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
+import { UpdateCommentDto } from "./dto/update-comment.dto";
 
 const i18n = mockI18n();
 const MOCKED_USER = mockUser();
@@ -93,6 +94,49 @@ describe(`CommentService`, () => {
         },
       });
       expect.hasAssertions();
+    });
+  });
+
+  describe(`Update`, () => {
+    it(`should update the comment when it exists`, async () => {
+      const id = 1;
+      const updateCommentDto: UpdateCommentDto = {
+        message: `Updated message`,
+        isApproved: true,
+      };
+
+      prisma.comment.findFirst.mockReturnValue({
+        id: 1,
+        message: `Original message`,
+        isApproved: false,
+      });
+
+      const result = await service.update(id, updateCommentDto, i18n);
+
+      expect(prisma.comment.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.comment.findFirst).toHaveBeenCalledWith({ where: { id } });
+
+      expect(prisma.comment.update).toHaveBeenCalledTimes(1);
+      expect(prisma.comment.update).toHaveBeenCalledWith({
+        where: { id },
+        data: updateCommentDto,
+      });
+
+      expect(result).toEqual(CORE_SUCCESS_DTO);
+    });
+
+    it(`should throw BadRequestException when the comment does not exist`, async () => {
+      const id = 1;
+      const updateCommentDto: UpdateCommentDto = {
+        message: `Updated message`,
+        isApproved: true,
+      };
+
+      prisma.comment.findFirst.mockReturnValue(null);
+
+      await expect(
+        service.update(id, updateCommentDto, i18n),
+      ).rejects.toThrowError(BadRequestException);
     });
   });
 });

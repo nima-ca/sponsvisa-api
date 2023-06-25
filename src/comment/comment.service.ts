@@ -69,27 +69,22 @@ export class CommentService {
     updateCommentDto: UpdateCommentDto,
     i18n: I18nContext<I18nTranslations>,
   ): Promise<UpdateCommentResponseDto> {
-    try {
-      const comment = await this.prisma.comment.findFirst({
-        where: { id },
-      });
+    const comment = await this.prisma.comment.findFirst({
+      where: { id },
+    });
 
-      if (!comment) {
-        throw new BadRequestException(
-          i18n.t(`comment.exceptions.commentNotFound`),
-        );
-      }
-
-      await this.prisma.comment.update({
-        where: { id },
-        data: {
-          ...comment,
-          ...updateCommentDto,
-        },
-      });
-    } catch (error) {
-      console.log(error);
+    if (!comment) {
+      throw new BadRequestException(
+        i18n.t(`comment.exceptions.commentNotFound`),
+      );
     }
+
+    await this.prisma.comment.update({
+      where: { id },
+      data: {
+        ...updateCommentDto,
+      },
+    });
 
     return CORE_SUCCESS_DTO;
   }
