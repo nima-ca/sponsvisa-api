@@ -4,6 +4,7 @@ import { I18nValidationExceptionFilter, I18nValidationPipe } from "nestjs-i18n";
 import { AppModule } from "./app.module";
 import { AllExceptionFilter } from "./common/httpExceptions/http-exception.filter";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import helmet from "helmet";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -35,6 +36,14 @@ async function bootstrap() {
     new AllExceptionFilter(),
     new I18nValidationExceptionFilter({
       detailedErrors: false,
+    }),
+  );
+
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: {
+        policy: `same-site`,
+      },
     }),
   );
 
