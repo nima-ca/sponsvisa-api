@@ -21,7 +21,8 @@ import {
   UpdateCommentDto,
   UpdateCommentResponseDto,
 } from "./dto/update-comment.dto";
-
+import { ApiTags } from "@nestjs/swagger";
+@ApiTags(`comment`)
 @Controller({
   version: `1`,
   path: `comment`,

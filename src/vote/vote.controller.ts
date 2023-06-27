@@ -1,26 +1,33 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post } from "@nestjs/common";
+import { CreateVoteDto, CreateVoteResponseDto } from "./dto/create-vote.dto";
 import { VoteService } from "./vote.service";
-import { CreateVoteDto } from "./dto/create-vote.dto";
-import { UpdateVoteDto } from "./dto/update-vote.dto";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
+import { User } from "@prisma/client";
+import { AuthUser } from "src/common/decorators/auth-user.decorator";
+import { I18n, I18nContext } from "nestjs-i18n";
+import { ApiTags } from "@nestjs/swagger";
+import { setRole } from "src/common/decorators/setRole.decorator";
 
-@Controller(`vote`)
+@ApiTags(`vote`)
+@Controller({
+  path: `vote`,
+  version: `1`,
+})
 export class VoteController {
   constructor(private readonly voteService: VoteService) {}
 
   @Post()
-  create(@Body() createVoteDto: CreateVoteDto) {
-    return this.voteService.create(createVoteDto);
+  @setRole([`ANY`])
+  create(
+    @Body() createVoteDto: CreateVoteDto,
+    @AuthUser() user: User,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<CreateVoteResponseDto> {
+    return this.voteService.create(createVoteDto, user, i18n);
   }
 
   @Delete(`:id`)
+  @setRole([`ANY`])
   remove(@Param(`id`) id: string) {
     return this.voteService.remove(+id);
   }

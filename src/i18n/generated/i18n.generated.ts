@@ -96,5 +96,15 @@ export type I18nTranslations = {
             "companyNotFound": string;
         };
     };
+    "vote": {
+        "constants": {
+            "commentId": {
+                "notValidError": string;
+            };
+            "status": {
+                "notValidError": string;
+            };
+        };
+    };
 };
 export type I18nPath = Path<I18nTranslations>;

@@ -9,6 +9,11 @@ import helmet from "helmet";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // add versioning to app
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
+
   // add swagger module
   const config = new DocumentBuilder()
     .setTitle(`Sponsvisa-API`)
@@ -26,11 +31,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  // add versioning to app
-  app.enableVersioning({
-    type: VersioningType.URI,
-  });
 
   app.useGlobalFilters(
     new AllExceptionFilter(),

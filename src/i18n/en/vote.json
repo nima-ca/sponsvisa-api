@@ -1,0 +1,10 @@
+{
+  "constants": {
+    "commentId": {
+      "notValidError": "Please enter a valid comment ID"
+    },
+    "status": {
+      "notValidError": "Please enter a valid Status"
+    }
+  }
+}
