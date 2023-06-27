@@ -9,7 +9,7 @@ type CommentUser = {
   role: UserRole;
 };
 
-type FindAllComment = {
+export type FindAllComment = {
   id: number;
   message: string;
   author: CommentUser;

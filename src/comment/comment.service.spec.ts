@@ -10,7 +10,8 @@ import { CreateCommentDto } from "./dto/create-comment.dto";
 import { BadRequestException } from "@nestjs/common";
 import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
-import { UserRole } from "@prisma/client";
+import { UserRole, VoteStatus } from "@prisma/client";
+import { FindAllCommentsResponseDto } from "./dto/find-comment.dto";
 
 const i18n = mockI18n();
 const MOCKED_USER = mockUser();
@@ -156,6 +157,138 @@ describe(`CommentService`, () => {
         BadRequestException,
       );
       expect(prisma.comment.findFirst).toHaveBeenCalledWith({ where: { id } });
+    });
+  });
+
+  describe(`FindAll`, () => {
+    const companyId = 1;
+    const limit = 10;
+    const page = 1;
+
+    it(`should return comments and totalCount`, async () => {
+      const MOCKED_COMMENTS = [
+        // Mocked comments array
+        {
+          id: 1,
+          message: `Comment 1`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          companyId: companyId,
+          votes: [
+            { vote: VoteStatus.UpVote, userId: MOCKED_USER.id },
+            { vote: VoteStatus.DownVote, userId: 2 },
+          ],
+          user: {
+            id: 1,
+            name: `User 1`,
+            role: UserRole.USER,
+          },
+        },
+        {
+          id: 2,
+          message: `Comment 2`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          companyId: companyId,
+          votes: [],
+          user: {
+            id: 2,
+            name: `User 2`,
+            role: UserRole.USER,
+          },
+        },
+      ];
+      const MOCKED_TOTAL_COUNT = 20;
+      prisma.company.findFirst.mockResolvedValue({ id: companyId });
+      prisma.comment.count.mockResolvedValue(MOCKED_TOTAL_COUNT);
+
+      prisma.comment.findMany.mockReturnValue(MOCKED_COMMENTS);
+
+      const expectedResult: FindAllCommentsResponseDto = {
+        ...CORE_SUCCESS_DTO,
+        comments: [
+          {
+            id: 1,
+            message: `Comment 1`,
+            createdAt: expect.any(Date),
+            companyId: companyId,
+            userVote: VoteStatus.UpVote,
+            upVotes: 1,
+            downVotes: 1,
+            author: {
+              id: 1,
+              name: `User 1`,
+              role: UserRole.USER,
+            },
+          },
+          {
+            id: 2,
+            message: `Comment 2`,
+            createdAt: expect.any(Date),
+            companyId: companyId,
+            userVote: undefined,
+            upVotes: 0,
+            downVotes: 0,
+            author: {
+              id: 2,
+              name: `User 2`,
+              role: UserRole.USER,
+            },
+          },
+        ],
+        totalCount: MOCKED_TOTAL_COUNT,
+      };
+
+      const result = await service.findAll(
+        companyId,
+        { limit, page },
+        i18n,
+        MOCKED_USER,
+      );
+
+      expect(prisma.company.findFirst).toHaveBeenCalledWith({
+        where: { id: companyId },
+      });
+      expect(prisma.comment.count).toHaveBeenCalledWith({
+        where: { companyId: companyId },
+      });
+      expect(prisma.comment.findMany).toHaveBeenCalledWith({
+        where: { companyId: companyId },
+        include: {
+          votes: {
+            select: {
+              vote: true,
+              userId: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: `asc`,
+        },
+        skip: 0,
+        take: limit,
+      });
+
+      expect(result).toEqual(expectedResult);
+      expect.hasAssertions();
+    });
+
+    it(`should throw BadRequestException when company is not found`, async () => {
+      prisma.company.findFirst.mockReturnValue(null);
+
+      await expect(
+        service.findAll(companyId, { limit, page }, i18n, MOCKED_USER),
+      ).rejects.toThrow(BadRequestException);
+      expect(prisma.company.findFirst).toHaveBeenCalledWith({
+        where: { id: companyId },
+      });
     });
   });
 });

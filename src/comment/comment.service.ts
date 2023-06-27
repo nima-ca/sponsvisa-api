@@ -10,6 +10,7 @@ import {
 } from "./dto/create-comment.dto";
 import { DeleteCommentResponseDto } from "./dto/delete-comment.dto";
 import {
+  FindAllComment,
   FindAllCommentsQueryDto,
   FindAllCommentsResponseDto,
 } from "./dto/find-comment.dto";
@@ -92,7 +93,7 @@ export class CommentService {
       take,
     });
 
-    const _comments = comments.map((comment) => {
+    const _comments: FindAllComment[] = comments.map((comment) => {
       const userVote = user
         ? comment.votes.find((vote) => vote.userId === user.id)?.vote
         : undefined;
@@ -107,7 +108,6 @@ export class CommentService {
         id: comment.id,
         message: comment.message,
         createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt,
         companyId: comment.companyId,
         userVote,
         upVotes,
