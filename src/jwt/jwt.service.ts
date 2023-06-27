@@ -9,7 +9,9 @@ export class JwtService {
 
   signAccessToken(payload: object): string {
     const jwtOptions = this.configService.get<IJwt>(`jwt`);
-    return JWT.sign(payload, jwtOptions.access.secret);
+    return JWT.sign(payload, jwtOptions.access.secret, {
+      expiresIn: jwtOptions.access.time,
+    });
   }
 
   verifyAccessToken<T = unknown>(token: string): T | null {

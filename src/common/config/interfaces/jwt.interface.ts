@@ -1,6 +1,6 @@
 export interface ISingleJwt {
   secret: string;
-  time: number;
+  time: string;
 }
 
 export interface IJwt {

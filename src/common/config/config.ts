@@ -8,19 +8,19 @@ export function config(): IConfig {
     jwt: {
       access: {
         secret: process.env.JWT_ACCESS_KEY,
-        time: parseInt(process.env.JWT_ACCESS_TIME, 10),
+        time: process.env.JWT_ACCESS_TIME,
       },
       confirmation: {
         secret: process.env.JWT_CONFIRMATION_SECRET,
-        time: parseInt(process.env.JWT_CONFIRMATION_TIME, 10),
+        time: process.env.JWT_CONFIRMATION_TIME,
       },
       resetPassword: {
         secret: process.env.JWT_RESET_PASSWORD_SECRET,
-        time: parseInt(process.env.JWT_RESET_PASSWORD_TIME, 10),
+        time: process.env.JWT_RESET_PASSWORD_TIME,
       },
       refresh: {
         secret: process.env.JWT_REFRESH_SECRET,
-        time: parseInt(process.env.JWT_REFRESH_TIME, 10),
+        time: process.env.JWT_REFRESH_TIME,
       },
     },
     emailService: {
