@@ -10,6 +10,7 @@ import { CreateCommentDto } from "./dto/create-comment.dto";
 import { BadRequestException } from "@nestjs/common";
 import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
+import { UserRole } from "@prisma/client";
 
 const i18n = mockI18n();
 const MOCKED_USER = mockUser();
@@ -43,24 +44,8 @@ describe(`CommentService`, () => {
   describe(`Create`, () => {
     const MOCKED_DTO: CreateCommentDto = {
       companyId: 50,
-      parentId: 90,
       message: `Hello`,
     };
-
-    it(`should check for parentId if exists in dto and throw error if not found`, async () => {
-      prisma.company.findFirst.mockReturnValue({ id: MOCKED_DTO.companyId });
-      prisma.comment.findFirst.mockReturnValue(null);
-
-      await expect(
-        service.create(MOCKED_DTO, i18n, MOCKED_USER),
-      ).rejects.toThrowError(BadRequestException);
-
-      expect(prisma.comment.findFirst).toHaveBeenCalledTimes(1);
-      expect(prisma.comment.findFirst).toHaveBeenCalledWith({
-        where: { id: MOCKED_DTO.parentId },
-      });
-      expect.hasAssertions();
-    });
 
     it(`should check for company and throw error if it is not found`, () => {
       prisma.company.findFirst.mockReturnValue(null);
@@ -78,7 +63,6 @@ describe(`CommentService`, () => {
 
     it(`should create the comment and return success`, async () => {
       prisma.company.findFirst.mockReturnValue({ id: MOCKED_DTO.companyId });
-      prisma.comment.findFirst.mockReturnValue({ id: MOCKED_DTO.parentId });
 
       expect(await service.create(MOCKED_DTO, i18n, MOCKED_USER)).toEqual(
         CORE_SUCCESS_DTO,
@@ -90,7 +74,6 @@ describe(`CommentService`, () => {
           message: MOCKED_DTO.message,
           userId: MOCKED_USER.id,
           companyId: MOCKED_DTO.companyId,
-          parentId: MOCKED_DTO.parentId ?? null,
         },
       });
       expect.hasAssertions();
@@ -102,19 +85,29 @@ describe(`CommentService`, () => {
       const id = 1;
       const updateCommentDto: UpdateCommentDto = {
         message: `Updated message`,
-        isApproved: true,
       };
 
       prisma.comment.findFirst.mockReturnValue({
         id: 1,
         message: `Original message`,
-        isApproved: false,
       });
 
-      const result = await service.update(id, updateCommentDto, i18n);
+      const result = await service.update(
+        id,
+        updateCommentDto,
+        i18n,
+        MOCKED_USER,
+      );
 
       expect(prisma.comment.findFirst).toHaveBeenCalledTimes(1);
-      expect(prisma.comment.findFirst).toHaveBeenCalledWith({ where: { id } });
+      expect(prisma.comment.findFirst).toHaveBeenCalledWith({
+        where: {
+          id,
+          ...(MOCKED_USER.role !== UserRole.ADMIN && {
+            userId: MOCKED_USER.id,
+          }),
+        },
+      });
 
       expect(prisma.comment.update).toHaveBeenCalledTimes(1);
       expect(prisma.comment.update).toHaveBeenCalledWith({
@@ -129,13 +122,12 @@ describe(`CommentService`, () => {
       const id = 1;
       const updateCommentDto: UpdateCommentDto = {
         message: `Updated message`,
-        isApproved: true,
       };
 
       prisma.comment.findFirst.mockReturnValue(null);
 
       await expect(
-        service.update(id, updateCommentDto, i18n),
+        service.update(id, updateCommentDto, i18n, MOCKED_USER),
       ).rejects.toThrowError(BadRequestException);
     });
   });

@@ -29,9 +29,3 @@ export const COMMENT_COMPANY_ID_IS_NOT_VALID_MESSAGE =
   i18nValidationMessage<I18nTranslations>(
     `comment.constants.companyId.isNotValidError`,
   );
-
-// isApproved
-export const COMMENT_IS_APPROVED_IS_NOT_VALID_MESSAGE =
-  i18nValidationMessage<I18nTranslations>(
-    `comment.constants.isApproved.isNotValidError`,
-  );
