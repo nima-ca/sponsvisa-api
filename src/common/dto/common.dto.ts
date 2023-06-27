@@ -8,6 +8,9 @@ import {
   getIsPositiveErrorMessage,
 } from "../constants/dto";
 
+const PAGINATION_DEFAULT_PAGE = 1;
+const PAGINATION_DEFAULT_LIMIT = 10;
+
 export class CoreResponseDto {
   success: boolean;
   error: string[] | null;
@@ -23,7 +26,7 @@ export class PaginationQueryDto {
   @Type(() => Number)
   @IsPositive({ message: getIsPositiveErrorMessage(`page`) })
   @IsInt({ message: getIsIntegerErrorMessage(`page`) })
-  page?: number;
+  page?: number = PAGINATION_DEFAULT_PAGE;
 
   @IsOptional()
   @Type(() => Number)
@@ -32,7 +35,7 @@ export class PaginationQueryDto {
   @Max(PAGINATION_MAX_LIMIT_DTO, {
     message: PAGINATION_MAX_LIMIT_MESSAGE_DTO,
   })
-  limit?: number;
+  limit?: number = PAGINATION_DEFAULT_LIMIT;
 }
 
 export class PaginationQueryWithSearchDto extends PaginationQueryDto {

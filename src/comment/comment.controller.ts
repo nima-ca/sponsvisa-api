@@ -1,24 +1,26 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from "@nestjs/common";
+import { User } from "@prisma/client";
+import { I18n, I18nContext } from "nestjs-i18n";
+import { AuthUser } from "src/common/decorators/auth-user.decorator";
+import { setRole } from "src/common/decorators/setRole.decorator";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { CommentService } from "./comment.service";
 import { CreateCommentDto } from "./dto/create-comment.dto";
+import { DeleteCommentResponseDto } from "./dto/delete-comment.dto";
+import { FindAllCommentsQueryDto } from "./dto/find-comment.dto";
 import {
   UpdateCommentDto,
   UpdateCommentResponseDto,
 } from "./dto/update-comment.dto";
-import { AuthUser } from "src/common/decorators/auth-user.decorator";
-import { I18n, I18nContext } from "nestjs-i18n";
-import { I18nTranslations } from "src/i18n/generated/i18n.generated";
-import { User } from "@prisma/client";
-import { setRole } from "src/common/decorators/setRole.decorator";
-import { DeleteCommentResponseDto } from "./dto/delete-comment.dto";
 
 @Controller({
   version: `1`,
@@ -37,24 +39,25 @@ export class CommentController {
     return this.commentService.create(createCommentDto, i18n, user);
   }
 
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
-  }
-
   @Get(`:id`)
-  findOne(@Param(`id`) id: string) {
-    return this.commentService.findOne(+id);
+  async findAll(
+    @Param(`id`) id: string,
+    @Query() query: FindAllCommentsQueryDto,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
+  ) {
+    return await this.commentService.findAll(+id, query, i18n, user);
   }
 
   @Patch(`:id`)
-  @setRole([`ADMIN`])
+  @setRole([`USER`])
   update(
     @Param(`id`) id: string,
     @Body() updateCommentDto: UpdateCommentDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
   ): Promise<UpdateCommentResponseDto> {
-    return this.commentService.update(+id, updateCommentDto, i18n);
+    return this.commentService.update(+id, updateCommentDto, i18n, user);
   }
 
   @Delete(`:id`)
