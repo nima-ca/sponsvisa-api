@@ -95,4 +95,33 @@ describe(`VoteService`, () => {
       expect.hasAssertions();
     });
   });
+
+  describe(`Remove`, () => {
+    const MOCKED_ID = 1;
+    it(`should throw BadRequestException when the comment does not exist`, async () => {
+      prisma.comment.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.remove(MOCKED_ID, MOCKED_USER, i18n),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(prisma.comment.findFirst).toHaveBeenCalledWith({
+        where: { id: MOCKED_ID },
+      });
+    });
+
+    it(`should delete the vote`, async () => {
+      prisma.comment.findFirst.mockResolvedValue({ id: MOCKED_ID });
+
+      const result = await service.remove(MOCKED_ID, MOCKED_USER, i18n);
+
+      expect(result).toEqual(CORE_SUCCESS_DTO);
+      expect(prisma.vote.delete).toHaveBeenCalledWith({
+        where: {
+          userId_commentId: { commentId: MOCKED_ID, userId: MOCKED_USER.id },
+        },
+      });
+      expect.hasAssertions();
+    });
+  });
 });

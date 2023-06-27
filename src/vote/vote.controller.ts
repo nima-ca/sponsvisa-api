@@ -28,7 +28,11 @@ export class VoteController {
 
   @Delete(`:id`)
   @setRole([`ANY`])
-  remove(@Param(`id`) id: string) {
-    return this.voteService.remove(+id);
+  remove(
+    @Param(`id`) id: string,
+    @AuthUser() user: User,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ) {
+    return this.voteService.remove(+id, user, i18n);
   }
 }
