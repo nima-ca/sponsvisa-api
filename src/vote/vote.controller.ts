@@ -23,7 +23,7 @@ export class VoteController {
     @AuthUser() user: User,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<CreateVoteResponseDto> {
-    return this.voteService.create(createVoteDto, user, i18n);
+    return this.voteService.createOrUpdate(createVoteDto, user, i18n);
   }
 
   @Delete(`:id`)

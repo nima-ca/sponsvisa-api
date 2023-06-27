@@ -10,7 +10,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class VoteService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
+  async createOrUpdate(
     { commentId, status }: CreateVoteDto,
     user: User,
     i18n: I18nContext<I18nTranslations>,
