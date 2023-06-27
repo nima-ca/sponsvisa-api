@@ -1,0 +1,10 @@
+{
+  "constants": {
+    "commentId": {
+      "notValidError": "را به درستی وارد کنید comment ID"
+    },
+    "status": {
+      "notValidError": "وضعیت را به درستی وارد کنید"
+    }
+  }
+}

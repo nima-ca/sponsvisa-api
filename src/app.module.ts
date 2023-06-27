@@ -16,6 +16,7 @@ import * as path from "path";
 import { AuthMiddleware } from "./auth/auth.middleware";
 import { LoggerMiddleware } from "./common/log/logger.middleware";
 import { CommentModule } from "./comment/comment.module";
+import { VoteModule } from "./vote/vote.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -43,6 +44,7 @@ import { CommentModule } from "./comment/comment.module";
     PrismaModule,
     CompanyModule,
     CommentModule,
+    VoteModule,
   ],
 })
 export class AppModule implements NestModule {
