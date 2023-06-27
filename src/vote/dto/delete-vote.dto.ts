@@ -1,4 +1,3 @@
-import { PartialType } from "@nestjs/swagger";
-import { CreateVoteDto } from "./create-vote.dto";
+import { CoreResponseDto } from "src/common/dto/common.dto";
 
-export class UpdateVoteDto extends PartialType(CreateVoteDto) {}
+export class DeleteVoteResponseDto extends CoreResponseDto {}
