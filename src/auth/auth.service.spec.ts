@@ -1,4 +1,7 @@
-import { InternalServerErrorException } from "@nestjs/common";
+import {
+  InternalServerErrorException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 import * as bcrypt from "bcrypt";
@@ -17,6 +20,10 @@ import {
   IAccessTokenPayload,
   IRefreshTokenPayload,
 } from "src/common/config/interfaces/jwt.interface";
+import {
+  ValidateRefreshTokenDto,
+  ValidateRefreshTokenResponseDto,
+} from "./dto/refreshToken.dto";
 
 jest.mock(`bcrypt`);
 describe(`AuthService`, () => {
@@ -206,6 +213,111 @@ describe(`AuthService`, () => {
         data: { refresh_token: MOCKED_GENERATED_TOKENS.hashedRefreshToken },
       });
       expect(result).toEqual(EXPECTED_LOGIN_RESULT_DTO);
+      expect.hasAssertions();
+    });
+  });
+
+  describe(`Refresh Token`, () => {
+    const MOCKED_REFRESH_TOKEN = `your-refresh-token`;
+    const dto: ValidateRefreshTokenDto = {
+      refreshToken: MOCKED_REFRESH_TOKEN,
+    };
+
+    it(`should validate the refresh token and return new tokens`, async () => {
+      const payload = { id: 123 };
+
+      // Mocking the dependencies
+      jwtService.verifyRefreshToken = jest.fn().mockReturnValue(payload);
+      prisma.user.findFirst.mockResolvedValueOnce({
+        id: payload.id,
+        refresh_token: `hashed-refresh-token`,
+      });
+
+      // mock bcrypt
+      jest.mocked(bcrypt.compareSync).mockReturnValue(true);
+
+      // mock generateToken method
+      const newTokens: IGenerateTokens = {
+        token: `new-token`,
+        refreshToken: `new-refresh-token`,
+        hashedRefreshToken: `new-hashed-refresh-token`,
+      };
+      service.generateTokens = jest.fn().mockReturnValueOnce(newTokens);
+
+      // call the service
+      const result = await service.validateRefreshToken(dto, i18n);
+
+      expect(jwtService.verifyRefreshToken).toHaveBeenCalledWith(
+        MOCKED_REFRESH_TOKEN,
+      );
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { id: payload.id },
+      });
+
+      expect(service.generateTokens).toHaveBeenCalledWith(
+        { id: payload.id },
+        { id: payload.id },
+      );
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: payload.id },
+        data: { refresh_token: newTokens.hashedRefreshToken },
+      });
+
+      const EXPECTED_RESULT: ValidateRefreshTokenResponseDto = {
+        success: true,
+        error: null,
+        token: newTokens.token,
+        refreshToken: newTokens.refreshToken,
+      };
+      expect(result).toEqual(EXPECTED_RESULT);
+    });
+
+    it(`should fail if the token is invalid`, () => {
+      jwtService.verifyRefreshToken = jest.fn().mockReturnValue(null);
+
+      expect(async () =>
+        service.validateRefreshToken(dto, i18n),
+      ).rejects.toThrowError(UnauthorizedException);
+
+      expect(jwtService.verifyRefreshToken).toHaveBeenCalledTimes(1);
+      expect(jwtService.verifyRefreshToken).toHaveBeenCalledWith(
+        MOCKED_REFRESH_TOKEN,
+      );
+      expect.hasAssertions();
+    });
+
+    it(`should fail if the user is not found`, () => {
+      const payload = { id: 1 };
+      jwtService.verifyRefreshToken = jest.fn().mockReturnValue(payload);
+      prisma.user.findFirst = jest.fn().mockReturnValue(null);
+
+      expect(async () =>
+        service.validateRefreshToken(dto, i18n),
+      ).rejects.toThrowError(UnauthorizedException);
+      expect(prisma.user.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { id: payload.id },
+      });
+      expect.hasAssertions();
+    });
+
+    it(`should fail if the refresh token is not the same in the db for user`, () => {
+      const payload = { id: 1 };
+      jwtService.verifyRefreshToken = jest.fn().mockReturnValue(payload);
+      const MOCKED_USER_FOUND = {
+        id: payload.id,
+        refresh_token: `hashed-refresh-token`,
+      };
+      prisma.user.findFirst = jest.fn().mockReturnValue(MOCKED_USER_FOUND);
+      jest.mocked(bcrypt.compareSync).mockReturnValue(false);
+
+      expect(async () =>
+        service.validateRefreshToken(dto, i18n),
+      ).rejects.toThrowError(UnauthorizedException);
+      expect(bcrypt.compareSync).toHaveBeenCalledWith(
+        MOCKED_REFRESH_TOKEN,
+        MOCKED_USER_FOUND.refresh_token,
+      );
       expect.hasAssertions();
     });
   });
