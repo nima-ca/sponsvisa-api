@@ -8,13 +8,15 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci 
 
 # Copy the source code
 COPY . .
 
 # Build the app
+RUN npx prisma generate
 RUN npm run build
+
 
 # Expose the app's port (if needed)
 EXPOSE 3000
