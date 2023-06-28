@@ -24,11 +24,15 @@ export type I18nTranslations = {
                 "minLengthError": string;
                 "maxLengthError": string;
             };
+            "refreshToken": {
+                "notValidError": string;
+            };
         };
         "exceptions": {
             "userAlreadyExists": string;
             "incorrectCredentials": string;
             "invalidToken": string;
+            "invalidRefreshToken": string;
             "notAuthorized": string;
         };
     };
