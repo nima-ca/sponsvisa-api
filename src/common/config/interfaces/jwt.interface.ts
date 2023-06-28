@@ -13,3 +13,7 @@ export interface IJwt {
 export interface IAccessTokenPayload {
   id: number;
 }
+
+export interface IRefreshTokenPayload {
+  id: number;
+}

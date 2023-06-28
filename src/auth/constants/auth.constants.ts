@@ -66,5 +66,11 @@ export const CONFIRM_PASSWORD_DO_NOT_MATCH_MESSAGE =
 export const EMAIL_IS_NOT_VALID_MESSAGE =
   i18nValidationMessage<I18nTranslations>(`auth.constants.email.notValidError`);
 
+// refresh token
+export const REFRESH_TOKEN_IS_NOT_VALID_MESSAGE =
+  i18nValidationMessage<I18nTranslations>(
+    `auth.constants.refreshToken.notValidError`,
+  );
+
 // auth
 export const AUTH_USER_KEY_IN_REQUEST = `AUTH_USER`;

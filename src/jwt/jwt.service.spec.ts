@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { JwtService } from "./jwt.service";
 import { ConfigService } from "@nestjs/config";
 import * as JWT from "jsonwebtoken";
+import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 
 jest.mock(`jsonwebtoken`, () => {
   return {
@@ -42,7 +43,7 @@ describe(`JwtService`, () => {
   });
 
   describe(`signAccessToken`, () => {
-    const payload = { userId: 1 };
+    const payload: IAccessTokenPayload = { id: 1 };
     const secret = `your_secret_key`;
     const expiresIn = `7d`;
 

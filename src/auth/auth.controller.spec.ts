@@ -5,7 +5,7 @@ import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { JwtService } from "src/jwt/jwt.service";
 import { ConfigService } from "@nestjs/config";
-import { LoginDto } from "./dto/login.dto";
+import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 
@@ -51,7 +51,12 @@ describe(`AuthController`, () => {
         email: `upchh@example.com`,
         password: `P@ssw0rd`,
       };
-      const result = { success: true, error: null, token: `some random token` };
+      const result: LoginResponseDto = {
+        success: true,
+        error: null,
+        token: `some random token`,
+        refreshToken: `some random refresh token`,
+      };
       jest.spyOn(service, `login`).mockImplementation(async () => result);
       expect(await controller.login(mockedLoginDto, i18n)).toBe(result);
     });

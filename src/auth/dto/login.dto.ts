@@ -37,4 +37,5 @@ export class LoginDto {
 
 export class LoginResponseDto extends CoreResponseDto {
   token: string | null;
+  refreshToken: string | null;
 }

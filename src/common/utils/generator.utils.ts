@@ -14,6 +14,7 @@ export const mockUser = (
     name: `test`,
     password: ``,
     role: UserRole.USER,
+    refresh_token: ``,
   },
 ): User => user;
 
