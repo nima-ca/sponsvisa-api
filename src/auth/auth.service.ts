@@ -17,6 +17,7 @@ import {
   ValidateRefreshTokenResponseDto,
 } from "./dto/refreshToken.dto";
 import { IGenerateTokens } from "./types/auth.types";
+import { MailService } from "src/mail/mail.service";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -25,6 +26,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(

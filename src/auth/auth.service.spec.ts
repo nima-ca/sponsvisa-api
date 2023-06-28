@@ -24,6 +24,7 @@ import {
   ValidateRefreshTokenDto,
   ValidateRefreshTokenResponseDto,
 } from "./dto/refreshToken.dto";
+import { MailService } from "src/mail/mail.service";
 
 jest.mock(`bcrypt`);
 describe(`AuthService`, () => {
@@ -44,6 +45,7 @@ describe(`AuthService`, () => {
           useClass: PrismaServiceMock, // Use the mock implementation
         },
         JwtService,
+        MailService,
         ConfigService,
       ],
     }).compile();
