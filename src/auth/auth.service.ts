@@ -16,6 +16,7 @@ import {
   ValidateRefreshTokenDto,
   ValidateRefreshTokenResponseDto,
 } from "./dto/refreshToken.dto";
+import { IGenerateTokens } from "./types/auth.types";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -146,7 +147,7 @@ export class AuthService {
   generateTokens(
     tokenPayload: IAccessTokenPayload,
     refreshTokenPayload: IRefreshTokenPayload,
-  ) {
+  ): IGenerateTokens {
     const token = this.jwtService.signAccessToken(tokenPayload);
     const refreshToken = this.jwtService.signRefreshToken(refreshTokenPayload);
     const hashedRefreshToken = bcrypt.hashSync(refreshToken, 10);

@@ -8,10 +8,15 @@ import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthService, PASSWORD_HASH_SALT } from "./auth.service";
-import { LoginDto } from "./dto/login.dto";
+import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
+import { IGenerateTokens } from "./types/auth.types";
+import {
+  IAccessTokenPayload,
+  IRefreshTokenPayload,
+} from "src/common/config/interfaces/jwt.interface";
 
 jest.mock(`bcrypt`);
 describe(`AuthService`, () => {
@@ -173,22 +178,72 @@ describe(`AuthService`, () => {
     });
 
     it(`should create and return token`, async () => {
-      const MOCKED_TOKEN = `some random token`;
+      const MOCKED_GENERATED_TOKENS: IGenerateTokens = {
+        token: `some random token`,
+        hashedRefreshToken: `hashed refresh token`,
+        refreshToken: `some random refresh token`,
+      };
+
+      const EXPECTED_LOGIN_RESULT_DTO: LoginResponseDto = {
+        success: true,
+        error: null,
+        token: MOCKED_GENERATED_TOKENS.token,
+        refreshToken: MOCKED_GENERATED_TOKENS.refreshToken,
+      };
+
       prisma.user.findFirst.mockReturnValue(mockedUser);
       jest.mocked(bcrypt.compareSync).mockReturnValue(true);
-      jwtService.signAccessToken = jest.fn().mockReturnValue(MOCKED_TOKEN);
+      service.generateTokens = jest
+        .fn()
+        .mockReturnValue(MOCKED_GENERATED_TOKENS);
 
       const result = await service.login(userInput, i18n);
 
-      expect(jwtService.signAccessToken).toHaveBeenCalledTimes(1);
-      expect(jwtService.signAccessToken).toHaveBeenCalledWith({
+      expect(service.generateTokens).toHaveBeenCalledTimes(1);
+      expect(prisma.user.update).toHaveBeenCalledTimes(1);
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: mockedUser.id },
+        data: { refresh_token: MOCKED_GENERATED_TOKENS.hashedRefreshToken },
+      });
+      expect(result).toEqual(EXPECTED_LOGIN_RESULT_DTO);
+      expect.hasAssertions();
+    });
+  });
+
+  describe(`generateTokens`, () => {
+    const mockedUser = { id: 1, password: `random-hashed-password` };
+
+    it(`should generate token and refresh token and hash the refresh token and return all of them`, () => {
+      const MOCKED_JWT_SIGN_ACCESS_TOKEN_RES = `jwt-sign-access-token`;
+      jwtService.signAccessToken = jest
+        .fn()
+        .mockReturnValue(MOCKED_JWT_SIGN_ACCESS_TOKEN_RES);
+
+      const MOCKED_JWT_SIGN_REFRESH_TOKEN_RES = `jwt-sign-refresh-token`;
+      jwtService.signRefreshToken = jest
+        .fn()
+        .mockReturnValue(MOCKED_JWT_SIGN_REFRESH_TOKEN_RES);
+
+      const MOCKED_BCRYPT_HASH_RES = `hashed-refresh-token`;
+      jest.mocked(bcrypt.hashSync).mockReturnValue(MOCKED_BCRYPT_HASH_RES);
+
+      const MOCKED_TOKEN_PAYLOAD: IAccessTokenPayload = { id: mockedUser.id };
+      const MOCKED_REFRESH_TOKEN_PAYLOAD: IRefreshTokenPayload = {
         id: mockedUser.id,
-      });
-      expect(result).toEqual({
-        success: true,
-        error: null,
-        token: MOCKED_TOKEN,
-      });
+      };
+
+      const EXPECTED_RESULT: IGenerateTokens = {
+        token: MOCKED_JWT_SIGN_ACCESS_TOKEN_RES,
+        refreshToken: MOCKED_JWT_SIGN_REFRESH_TOKEN_RES,
+        hashedRefreshToken: MOCKED_BCRYPT_HASH_RES,
+      };
+
+      const result = service.generateTokens(
+        MOCKED_TOKEN_PAYLOAD,
+        MOCKED_REFRESH_TOKEN_PAYLOAD,
+      );
+
+      expect(result).toEqual(EXPECTED_RESULT);
       expect.hasAssertions();
     });
   });
