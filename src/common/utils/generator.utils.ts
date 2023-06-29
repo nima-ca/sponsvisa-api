@@ -35,6 +35,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public vote = {
     findUnique: jest.fn(),
@@ -45,6 +46,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public user = {
     findUnique: jest.fn(),
@@ -55,6 +57,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public log = {
     findUnique: jest.fn(),
@@ -65,6 +68,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public comment = {
     findUnique: jest.fn(),
@@ -75,6 +79,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public verification = {
     findUnique: jest.fn(),
@@ -85,6 +90,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public bookmarks = {
     findUnique: jest.fn(),
@@ -95,6 +101,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
 }
 

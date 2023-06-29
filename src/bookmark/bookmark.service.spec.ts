@@ -89,4 +89,31 @@ describe(`BookmarkService`, () => {
       expect.hasAssertions();
     });
   });
+
+  describe(`Remove`, () => {
+    const ID = 1;
+    it(`should throw error if the company is not found`, async () => {
+      prisma.company.findFirst.mockReturnValue(null);
+      await expect(service.remove(ID, MOCKED_USER, i18n)).rejects.toThrowError(
+        BadRequestException,
+      );
+
+      expect(prisma.company.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.company.findFirst).toHaveBeenCalledWith({
+        where: { id: ID },
+      });
+      expect.hasAssertions();
+    });
+
+    it(`should remove all the bookmarks for the company and user`, async () => {
+      prisma.company.findFirst.mockReturnValue({ id: ID });
+
+      const result = await service.remove(ID, MOCKED_USER, i18n);
+      expect(result).toEqual(CORE_SUCCESS_DTO);
+      expect(prisma.bookmarks.deleteMany).toHaveBeenCalledTimes(1);
+      expect(prisma.bookmarks.deleteMany).toHaveBeenCalledWith({
+        where: { companyId: ID, userId: MOCKED_USER.id },
+      });
+    });
+  });
 });
