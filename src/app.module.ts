@@ -13,6 +13,8 @@ import { JwtModule } from "./jwt/jwt.module";
 import { ListModule } from "./list/list.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { VoteModule } from "./vote/vote.module";
+import { MailModule } from "./mail/mail.module";
+import { BookmarkModule } from "./bookmark/bookmark.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,6 +44,8 @@ import { VoteModule } from "./vote/vote.module";
     CommentModule,
     VoteModule,
     ListModule,
+    MailModule,
+    BookmarkModule,
   ],
 })
 export class AppModule implements NestModule {

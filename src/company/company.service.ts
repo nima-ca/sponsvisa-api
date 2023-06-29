@@ -54,16 +54,17 @@ export class CompanyService {
       searchQuery = ``,
       country = ``,
       isApproved,
+      bookmark,
     }: FindAllCompaniesQueryDto,
     i18n: I18nContext<I18nTranslations>,
     user: User,
   ): Promise<FindAllCompaniesResponseDto> {
     const skip = (page - 1) * limit;
 
-    const isUserAdmin = user && user.role === UserRole.ADMIN;
+    const isLoggedIn = !!user;
+    const isUserAdmin = isLoggedIn && user.role === UserRole.ADMIN;
     const isApprovedProvidedByAdmin =
       isUserAdmin && typeof isApproved !== `undefined`;
-
     const companies = await this.prisma.company.findMany({
       where: {
         country: {
@@ -73,6 +74,12 @@ export class CompanyService {
           contains: searchQuery,
           mode: `insensitive`,
         },
+        ...(isLoggedIn &&
+          bookmark && {
+            Bookmarks: {
+              some: { userId: user.id },
+            },
+          }),
         ...(!isUserAdmin && { isApproved: true }),
         ...(isApprovedProvidedByAdmin && { isApproved }),
       },
@@ -89,6 +96,12 @@ export class CompanyService {
           contains: searchQuery,
           mode: `insensitive`,
         },
+        ...(isLoggedIn &&
+          bookmark && {
+            Bookmarks: {
+              some: { userId: user.id },
+            },
+          }),
         ...(!isUserAdmin && { isApproved: true }),
         ...(isApprovedProvidedByAdmin && { isApproved }),
       },

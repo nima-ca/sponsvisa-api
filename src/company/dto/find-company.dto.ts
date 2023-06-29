@@ -21,6 +21,10 @@ export class FindAllCompaniesQueryDto extends PaginationQueryWithSearchDto {
 
   @IsOptional()
   @Transform(({ value }) => value === `true`)
+  bookmark?: boolean;
+
+  @IsOptional()
+  @Transform(({ value }) => value === `true`)
   isApproved?: boolean;
 }
 

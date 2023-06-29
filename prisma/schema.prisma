@@ -8,16 +8,27 @@ datasource db {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  name       String
-  role       UserRole  @default(USER)
-  email      String
-  password   String
-  isVerified Boolean   @default(false)
-  createdAt  DateTime  @default(now())
-  companies  Company[]
-  votes      Vote[]
-  comments   Comment[]
+  id            Int           @id @default(autoincrement())
+  name          String
+  role          UserRole      @default(USER)
+  email         String
+  password      String
+  refresh_token String?
+  isVerified    Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  companies     Company[]
+  votes         Vote[]
+  comments      Comment[]
+  Verification  Verification?
+}
+
+model Verification {
+  id        Int      @id @default(autoincrement())
+  code      String
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int?     @unique
+  createdAt DateTime @default(now())
+  expiresIn DateTime
 }
 
 model Company {
@@ -34,18 +45,19 @@ model Company {
   userId                     Int?
   isApproved                 Boolean            @default(false)
   comments                   Comment[]
+  Bookmarks                  Bookmarks[]
 }
 
 model Comment {
-  id         Int       @id @default(autoincrement())
-  message    String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int
-  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId  Int
-  votes      Vote[]
+  id        Int      @id @default(autoincrement())
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int
+  votes     Vote[]
 }
 
 model Vote {
@@ -61,6 +73,7 @@ model Vote {
 model Bookmarks {
   id        Int      @id @default(autoincrement())
   userId    Int
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int
   createdAt DateTime @default(now())
 }

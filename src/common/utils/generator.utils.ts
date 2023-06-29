@@ -14,6 +14,7 @@ export const mockUser = (
     name: `test`,
     password: ``,
     role: UserRole.USER,
+    refresh_token: ``,
   },
 ): User => user;
 
@@ -34,6 +35,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public vote = {
     findUnique: jest.fn(),
@@ -44,6 +46,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public user = {
     findUnique: jest.fn(),
@@ -54,6 +57,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public log = {
     findUnique: jest.fn(),
@@ -64,6 +68,7 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
   public comment = {
     findUnique: jest.fn(),
@@ -74,5 +79,34 @@ export class PrismaServiceMock {
     update: jest.fn(),
     findFirst: jest.fn(),
     upsert: jest.fn(),
+    deleteMany: jest.fn(),
   };
+  public verification = {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+    findFirst: jest.fn(),
+    upsert: jest.fn(),
+    deleteMany: jest.fn(),
+  };
+  public bookmarks = {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+    findFirst: jest.fn(),
+    upsert: jest.fn(),
+    deleteMany: jest.fn(),
+  };
+}
+
+export class VerificationServiceMock {
+  // Define mock methods and properties that you need for testing
+
+  public sendCode = jest.fn();
 }

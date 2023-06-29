@@ -1,0 +1,10 @@
+{
+  "constants": {
+    "companyId": {
+      "isNotValidError": "را به درستی وارد کنید Company Id"
+    }
+  },
+  "exceptions": {
+    "companyNotFound": "شرکت یافت نشد!"
+  }
+}
