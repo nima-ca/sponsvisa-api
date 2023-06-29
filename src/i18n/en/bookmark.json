@@ -1,0 +1,10 @@
+{
+  "constants": {
+    "companyId": {
+      "isNotValidError": "Company Id is not valid"
+    }
+  },
+  "exceptions": {
+    "companyNotFound": "Company is not found!"
+  }
+}

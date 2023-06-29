@@ -86,6 +86,16 @@ export class PrismaServiceMock {
     findFirst: jest.fn(),
     upsert: jest.fn(),
   };
+  public bookmarks = {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+    findFirst: jest.fn(),
+    upsert: jest.fn(),
+  };
 }
 
 export class VerificationServiceMock {
