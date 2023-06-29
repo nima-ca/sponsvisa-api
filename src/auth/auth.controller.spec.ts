@@ -8,6 +8,7 @@ import { ConfigService } from "@nestjs/config";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
+import { MailService } from "src/mail/mail.service";
 
 describe(`AuthController`, () => {
   let service: AuthService;
@@ -20,7 +21,13 @@ describe(`AuthController`, () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService, PrismaService, JwtService, ConfigService],
+      providers: [
+        AuthService,
+        PrismaService,
+        JwtService,
+        MailService,
+        ConfigService,
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
