@@ -76,4 +76,20 @@ export class PrismaServiceMock {
     findFirst: jest.fn(),
     upsert: jest.fn(),
   };
+  public verification = {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+    findFirst: jest.fn(),
+    upsert: jest.fn(),
+  };
+}
+
+export class VerificationServiceMock {
+  // Define mock methods and properties that you need for testing
+
+  public sendCode = jest.fn();
 }

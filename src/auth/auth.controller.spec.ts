@@ -9,6 +9,7 @@ import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { MailService } from "src/mail/mail.service";
+import { VerificationService } from "./verification.service";
 
 describe(`AuthController`, () => {
   let service: AuthService;
@@ -27,6 +28,7 @@ describe(`AuthController`, () => {
         JwtService,
         MailService,
         ConfigService,
+        VerificationService,
       ],
     }).compile();
 

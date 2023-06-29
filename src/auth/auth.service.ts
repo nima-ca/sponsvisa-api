@@ -9,15 +9,15 @@ import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
-import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
-import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
-import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
 import {
   ValidateRefreshTokenDto,
   ValidateRefreshTokenResponseDto,
 } from "./dto/refreshToken.dto";
+import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
+import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
+import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
 import { IGenerateTokens } from "./types/auth.types";
-import { MailService } from "src/mail/mail.service";
+import { VerificationService } from "./verification.service";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -26,7 +26,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
+    private readonly verificationService: VerificationService,
   ) {}
 
   async register(
@@ -45,13 +45,15 @@ export class AuthService {
 
     const hashedPassword = bcrypt.hashSync(password, PASSWORD_HASH_SALT);
 
-    await this.prisma.user.create({
+    const createdUser = await this.prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
       },
     });
+
+    this.verificationService.sendCode(createdUser, i18n);
 
     return { success: true, error: null };
   }
