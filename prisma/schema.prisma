@@ -8,17 +8,26 @@ datasource db {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   name          String
-  role          UserRole  @default(USER)
+  role          UserRole      @default(USER)
   email         String
   password      String
   refresh_token String?
-  isVerified    Boolean   @default(false)
-  createdAt     DateTime  @default(now())
+  isVerified    Boolean       @default(false)
+  createdAt     DateTime      @default(now())
   companies     Company[]
   votes         Vote[]
   comments      Comment[]
+  Verification  Verification?
+}
+
+model Verification {
+  id        Int      @id @default(autoincrement())
+  code      String
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int?     @unique
+  createdAt DateTime @default(now())
 }
 
 model Company {
