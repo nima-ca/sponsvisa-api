@@ -78,9 +78,10 @@ export class VerificationService {
     return Date.now() > expiresIn.getTime();
   }
 
-  getTimeToWaitForNextVerificationCode(expiresIn: Date): number | null {
+  getTimeToWaitForNextVerificationCode(expiresIn: Date): number {
     const NOW = Date.now();
     const TIME_TO_WAIT = Math.ceil((expiresIn.getTime() - NOW) / 60 / 1000);
+    if (TIME_TO_WAIT <= 0) return 0;
     return TIME_TO_WAIT;
   }
 
