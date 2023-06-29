@@ -8,6 +8,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { User } from "@prisma/client";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { I18nContext } from "nestjs-i18n";
+import { RemoveBookmarkResponseDto } from "./dto/remove-bookmark.dto";
 
 @Injectable()
 export class BookmarkService {
@@ -19,7 +20,7 @@ export class BookmarkService {
     i18n: I18nContext<I18nTranslations>,
   ): Promise<CreateBookmarkResponseDto> {
     const company = this.prisma.company.findFirst({
-      where: { id: companyId },
+      where: { id: companyId, isApproved: true },
     });
 
     if (!company) {
@@ -44,7 +45,25 @@ export class BookmarkService {
     return `This action returns all bookmark`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} bookmark`;
+  async remove(
+    id: number,
+    user: User,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<RemoveBookmarkResponseDto> {
+    const company = await this.prisma.company.findFirst({
+      where: { id, isApproved: true },
+    });
+
+    if (!company) {
+      throw new BadRequestException(
+        i18n.t(`bookmark.exceptions.companyNotFound`),
+      );
+    }
+
+    await this.prisma.bookmarks.deleteMany({
+      where: { companyId: id, userId: user.id },
+    });
+
+    return CORE_SUCCESS_DTO;
   }
 }
