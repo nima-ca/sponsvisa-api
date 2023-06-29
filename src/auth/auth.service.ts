@@ -7,7 +7,6 @@ import {
 } from "src/common/config/interfaces/jwt.interface";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
-import { MailService } from "src/mail/mail.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import {
@@ -27,7 +26,6 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
     private readonly verificationService: VerificationService,
   ) {}
 

@@ -6,31 +6,36 @@ import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 import * as bcrypt from "bcrypt";
 import { I18nContext } from "nestjs-i18n";
-import { PrismaServiceMock } from "src/common/utils/generator.utils";
-import { I18nTranslations } from "src/i18n/generated/i18n.generated";
-import { JwtService } from "src/jwt/jwt.service";
-import { PrismaService } from "src/prisma/prisma.service";
-import { AuthService, PASSWORD_HASH_SALT } from "./auth.service";
-import { LoginDto, LoginResponseDto } from "./dto/login.dto";
-import { RegisterDto } from "./dto/register.dto";
-import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
-import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
-import { IGenerateTokens } from "./types/auth.types";
 import {
   IAccessTokenPayload,
   IRefreshTokenPayload,
 } from "src/common/config/interfaces/jwt.interface";
 import {
+  PrismaServiceMock,
+  VerificationServiceMock,
+} from "src/common/utils/generator.utils";
+import { I18nTranslations } from "src/i18n/generated/i18n.generated";
+import { JwtService } from "src/jwt/jwt.service";
+import { MailService } from "src/mail/mail.service";
+import { PrismaService } from "src/prisma/prisma.service";
+import { AuthService, PASSWORD_HASH_SALT } from "./auth.service";
+import { LoginDto, LoginResponseDto } from "./dto/login.dto";
+import {
   ValidateRefreshTokenDto,
   ValidateRefreshTokenResponseDto,
 } from "./dto/refreshToken.dto";
-import { MailService } from "src/mail/mail.service";
+import { RegisterDto } from "./dto/register.dto";
+import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
+import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
+import { IGenerateTokens } from "./types/auth.types";
+import { VerificationService } from "./verification.service";
 
 jest.mock(`bcrypt`);
 describe(`AuthService`, () => {
   let service: AuthService;
   let prisma: PrismaServiceMock;
   let jwtService: JwtService;
+  let verificationService: VerificationServiceMock;
 
   const i18n = {
     t: jest.fn().mockReturnValue(`random translated text`),
@@ -44,6 +49,10 @@ describe(`AuthService`, () => {
           provide: PrismaService,
           useClass: PrismaServiceMock, // Use the mock implementation
         },
+        {
+          provide: VerificationService,
+          useClass: VerificationServiceMock,
+        },
         JwtService,
         MailService,
         ConfigService,
@@ -55,10 +64,16 @@ describe(`AuthService`, () => {
     ) as unknown as PrismaServiceMock;
     service = module.get<AuthService>(AuthService);
     jwtService = module.get<JwtService>(JwtService);
+    verificationService = module.get<VerificationService>(
+      VerificationService,
+    ) as unknown as VerificationServiceMock;
   });
 
   it(`should be defined`, () => {
     expect(service).toBeDefined();
+    expect(prisma).toBeDefined();
+    expect(jwtService).toBeDefined();
+    expect(verificationService).toBeDefined();
   });
 
   describe(`Register`, () => {
@@ -110,6 +125,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst.mockReturnValue(null);
 
       const result = await service.register(mockedData, i18n);
+      jest.mocked(bcrypt.hashSync).mockReturnValue(`hashed-password`);
 
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
       expect(prisma.user.create).toHaveBeenCalledWith({
@@ -120,6 +136,14 @@ describe(`AuthService`, () => {
         },
       });
       expect(result).toEqual({ success: true, error: null });
+    });
+
+    it(`should send verification code`, async () => {
+      prisma.user.findFirst.mockReturnValue(null);
+
+      await service.register(mockedData, i18n);
+
+      expect(verificationService.sendCode).toHaveBeenCalledTimes(1);
     });
 
     it(`should fail on error`, async () => {
