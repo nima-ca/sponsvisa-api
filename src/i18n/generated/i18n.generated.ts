@@ -40,6 +40,16 @@ export type I18nTranslations = {
             "alreadyVerified": string;
         };
     };
+    "bookmark": {
+        "constants": {
+            "companyId": {
+                "isNotValidError": string;
+            };
+        };
+        "exceptions": {
+            "companyNotFound": string;
+        };
+    };
     "comment": {
         "constants": {
             "message": {
