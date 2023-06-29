@@ -20,7 +20,7 @@ export class BookmarkService {
     i18n: I18nContext<I18nTranslations>,
   ): Promise<CreateBookmarkResponseDto> {
     const company = this.prisma.company.findFirst({
-      where: { id: companyId },
+      where: { id: companyId, isApproved: true },
     });
 
     if (!company) {
@@ -51,7 +51,7 @@ export class BookmarkService {
     i18n: I18nContext<I18nTranslations>,
   ): Promise<RemoveBookmarkResponseDto> {
     const company = await this.prisma.company.findFirst({
-      where: { id },
+      where: { id, isApproved: true },
     });
 
     if (!company) {

@@ -10,8 +10,13 @@ import { AuthUser } from "src/common/decorators/auth-user.decorator";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { setRole } from "src/common/decorators/setRole.decorator";
 import { RemoveBookmarkResponseDto } from "./dto/remove-bookmark.dto";
+import { ApiTags } from "@nestjs/swagger";
 
-@Controller(`bookmark`)
+@ApiTags(`bookmark`)
+@Controller({
+  path: `bookmark`,
+  version: `1`,
+})
 export class BookmarkController {
   constructor(private readonly bookmarkService: BookmarkService) {}
 

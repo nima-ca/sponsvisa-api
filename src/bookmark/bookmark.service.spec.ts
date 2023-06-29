@@ -55,7 +55,7 @@ describe(`BookmarkService`, () => {
 
       expect(prisma.company.findFirst).toHaveBeenCalledTimes(1);
       expect(prisma.company.findFirst).toHaveBeenCalledWith({
-        where: { id: dto.companyId },
+        where: { id: dto.companyId, isApproved: true },
       });
       expect.hasAssertions();
     });
@@ -100,7 +100,7 @@ describe(`BookmarkService`, () => {
 
       expect(prisma.company.findFirst).toHaveBeenCalledTimes(1);
       expect(prisma.company.findFirst).toHaveBeenCalledWith({
-        where: { id: ID },
+        where: { id: ID, isApproved: true },
       });
       expect.hasAssertions();
     });
