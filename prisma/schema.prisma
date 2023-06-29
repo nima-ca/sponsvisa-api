@@ -45,6 +45,7 @@ model Company {
   userId                     Int?
   isApproved                 Boolean            @default(false)
   comments                   Comment[]
+  Bookmarks                  Bookmarks[]
 }
 
 model Comment {
@@ -72,6 +73,7 @@ model Vote {
 model Bookmarks {
   id        Int      @id @default(autoincrement())
   userId    Int
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int
   createdAt DateTime @default(now())
 }

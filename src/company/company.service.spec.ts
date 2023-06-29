@@ -158,6 +158,7 @@ describe(`CompanyService`, () => {
       limit: 10,
       searchQuery: `test`,
       country: `USA`,
+      bookmark: false,
     };
 
     const totalCount = 2;
@@ -175,6 +176,9 @@ describe(`CompanyService`, () => {
         where: {
           country: { contains: queryDto.country },
           name: { contains: queryDto.searchQuery, mode: `insensitive` },
+          ...(queryDto.bookmark && {
+            Bookmarks: { some: { userId: MOCKED_USER.id } },
+          }),
           ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
           ...(MOCKED_USER.role === UserRole.ADMIN &&
             typeof queryDto.isApproved !== `undefined` && {
@@ -188,6 +192,9 @@ describe(`CompanyService`, () => {
         where: {
           country: { contains: queryDto.country },
           name: { contains: queryDto.searchQuery, mode: `insensitive` },
+          ...(queryDto.bookmark && {
+            Bookmarks: { some: { userId: MOCKED_USER.id } },
+          }),
           ...(MOCKED_USER.role !== UserRole.ADMIN && { isApproved: true }),
           ...(MOCKED_USER.role === UserRole.ADMIN &&
             typeof queryDto.isApproved !== `undefined` && {
