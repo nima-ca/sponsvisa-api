@@ -35,7 +35,9 @@ export type I18nTranslations = {
             "invalidRefreshToken": string;
             "notAuthorized": string;
             "verificationCodeExpired": string;
+            "verificationCodeIsNotValid": string;
             "waitForNextCode": string;
+            "alreadyVerified": string;
         };
     };
     "comment": {

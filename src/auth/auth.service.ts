@@ -55,7 +55,7 @@ export class AuthService {
       },
     });
 
-    this.verificationService.sendVerificationCode(createdUser, i18n);
+    this.verificationService.sendCode(createdUser, i18n);
 
     return { success: true, error: null };
   }

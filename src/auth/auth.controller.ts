@@ -6,6 +6,15 @@ import { AuthService } from "./auth.service";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
 import { ValidateRefreshTokenDto } from "./dto/refreshToken.dto";
+import { VerificationService } from "./verification.service";
+import { setRole } from "src/common/decorators/setRole.decorator";
+import { AuthUser } from "src/common/decorators/auth-user.decorator";
+import { User } from "@prisma/client";
+import {
+  SendVerificationCodeResponseDto,
+  VerifyCodeDto,
+  VerifyCodeResponseDto,
+} from "./dto/verification.dto";
 
 @ApiTags(`auth`)
 @Controller({
@@ -13,7 +22,10 @@ import { ValidateRefreshTokenDto } from "./dto/refreshToken.dto";
   version: `1`,
 })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly verificationService: VerificationService,
+  ) {}
 
   @Post(`register`)
   register(
@@ -37,5 +49,24 @@ export class AuthController {
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<LoginResponseDto> {
     return this.authService.validateRefreshToken(validateRefreshTokenDto, i18n);
+  }
+
+  @Post(`verify_code`)
+  @setRole([`ANY`])
+  verifyCode(
+    @Body() verifyCodeDto: VerifyCodeDto,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
+  ): Promise<VerifyCodeResponseDto> {
+    return this.verificationService.verifyCode(verifyCodeDto, user, i18n);
+  }
+
+  @Post(`send_verification_code`)
+  @setRole([`ANY`])
+  sendVerificationCode(
+    @I18n() i18n: I18nContext<I18nTranslations>,
+    @AuthUser() user: User,
+  ): Promise<SendVerificationCodeResponseDto> {
+    return this.verificationService.sendVerificationCode(user, i18n);
   }
 }

@@ -28,6 +28,7 @@ model Verification {
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int?     @unique
   createdAt DateTime @default(now())
+  expiresIn DateTime
 }
 
 model Company {

@@ -8,7 +8,14 @@ import { PrismaService } from "src/prisma/prisma.service";
 import {
   VERIFICATION_CODE_SEED,
   VERIFICATION_CODE_LENGTH,
+  VERIFICATION_CODE_EXPIRE_TIME_IN_MINUTES,
 } from "./constants/auth.constants";
+import {
+  SendVerificationCodeResponseDto,
+  VerifyCodeDto,
+  VerifyCodeResponseDto,
+} from "./dto/verification.dto";
+import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
 
 @Injectable()
 export class VerificationService {
@@ -17,17 +24,19 @@ export class VerificationService {
     private readonly mailService: MailService,
   ) {}
 
-  async sendVerificationCode(user: User, i18n: I18nContext<I18nTranslations>) {
-    const currentCode = await this.prisma.verification.findFirst({
+  async sendCode(user: User, i18n: I18nContext<I18nTranslations>) {
+    const verification = await this.prisma.verification.findFirst({
       where: { userId: user.id },
     });
 
-    if (currentCode) {
-      const timeToWait = this.getTimeToWaitForNextVerificationCode(
-        currentCode.createdAt,
-      );
+    if (verification) {
+      const isCodeExpired = this.isCodeExpired(verification.expiresIn);
 
-      if (timeToWait) {
+      if (!isCodeExpired) {
+        const timeToWait = this.getTimeToWaitForNextVerificationCode(
+          verification.expiresIn,
+        );
+
         throw new BadRequestException(
           i18n.t(`auth.exceptions.waitForNextCode`, {
             args: {
@@ -37,18 +46,24 @@ export class VerificationService {
         );
       }
 
-      await this.prisma.verification.delete({ where: { id: currentCode.id } });
+      await this.prisma.verification.delete({ where: { id: verification.id } });
     }
 
     const code = this.verificationCodeGenerator();
+    const codeExpireTime = new Date(
+      Date.now() + VERIFICATION_CODE_EXPIRE_TIME_IN_MINUTES * 60 * 1000,
+    );
     const to = user.email;
     const subject = `Sponsvisa Verification Code`;
     const text = `
-    Welcome to Sponsvisa!
+    Sponsvisa Verification Code!
+    Welcome ${user.name}
     here is your verification code: ${code}
     `;
     this.mailService.sendEmail(to, subject, text);
-    await this.prisma.verification.create({ data: { code, userId: user.id } });
+    await this.prisma.verification.create({
+      data: { code, userId: user.id, expiresIn: codeExpireTime },
+    });
   }
 
   verificationCodeGenerator(): string {
@@ -59,17 +74,63 @@ export class VerificationService {
     return verificationCodeGenerator();
   }
 
-  getTimeToWaitForNextVerificationCode(creationTime: Date): number | null {
-    const CURRENT_CODE_CREATED_TIME = creationTime.getTime();
-    const MINUTES_TO_EXPIRE = 3;
-    const EXPIRE_TIME = MINUTES_TO_EXPIRE * 60 * 1000; // convert to minutes
-    const TIME_TO_EXPIRE = CURRENT_CODE_CREATED_TIME + EXPIRE_TIME;
+  isCodeExpired(expiresIn: Date) {
+    return Date.now() > expiresIn.getTime();
+  }
+
+  getTimeToWaitForNextVerificationCode(expiresIn: Date): number | null {
     const NOW = Date.now();
-    if (TIME_TO_EXPIRE > NOW) {
-      const TIME_TO_WAIT = Math.ceil((TIME_TO_EXPIRE - NOW) / 60 / 1000);
-      return TIME_TO_WAIT;
+    const TIME_TO_WAIT = Math.ceil((expiresIn.getTime() - NOW) / 60 / 1000);
+    return TIME_TO_WAIT;
+  }
+
+  async verifyCode(
+    { code }: VerifyCodeDto,
+    user: User,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<VerifyCodeResponseDto> {
+    if (user.isVerified) {
+      throw new BadRequestException(i18n.t(`auth.exceptions.alreadyVerified`));
     }
 
-    return null;
+    const verification = await this.prisma.verification.findFirst({
+      where: { userId: user.id, code },
+    });
+
+    if (!verification) {
+      throw new BadRequestException(
+        i18n.t(`auth.exceptions.verificationCodeExpired`),
+      );
+    }
+
+    const isCodeExpired = this.isCodeExpired(verification.expiresIn);
+
+    if (isCodeExpired) {
+      throw new BadRequestException(
+        i18n.t(`auth.exceptions.verificationCodeExpired`),
+      );
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { isVerified: true },
+    });
+
+    await this.prisma.verification.delete({ where: { id: verification.id } });
+
+    return CORE_SUCCESS_DTO;
+  }
+
+  async sendVerificationCode(
+    user: User,
+    i18n: I18nContext<I18nTranslations>,
+  ): Promise<SendVerificationCodeResponseDto> {
+    if (user.isVerified) {
+      throw new BadRequestException(i18n.t(`auth.exceptions.alreadyVerified`));
+    }
+
+    await this.sendCode(user, i18n);
+
+    return CORE_SUCCESS_DTO;
   }
 }
