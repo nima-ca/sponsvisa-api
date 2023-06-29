@@ -65,7 +65,6 @@ export class CompanyService {
     const isUserAdmin = isLoggedIn && user.role === UserRole.ADMIN;
     const isApprovedProvidedByAdmin =
       isUserAdmin && typeof isApproved !== `undefined`;
-    console.log(isLoggedIn && bookmark);
     const companies = await this.prisma.company.findMany({
       where: {
         country: {
