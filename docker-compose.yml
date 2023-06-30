@@ -3,9 +3,7 @@ version: "3"
 services:
   api:
     container_name: sponsvisa-backend
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/nima-ca/sponsvisa-api:latest
     ports:
       - "4000:4000"
     depends_on:
