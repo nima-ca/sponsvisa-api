@@ -13,10 +13,11 @@ import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    const i18n = I18nContext.current<I18nTranslations>();
-    const internalServerError = i18n.t(`common.errors.internalServerException`);
-
     try {
+      const i18n = I18nContext.current<I18nTranslations>();
+      const internalServerError = i18n.t(
+        `common.errors.internalServerException`,
+      );
       const ctx = host.switchToHttp();
       const response = ctx.getResponse<Response>();
       const status = exception.getStatus();
@@ -34,7 +35,8 @@ export class AllExceptionFilter implements ExceptionFilter {
 
       response.status(status).json(resObj);
     } catch (error) {
-      new InternalServerErrorException(internalServerError);
+      new InternalServerErrorException(`Internal Server Error`);
+      console.log(error);
     }
   }
 }

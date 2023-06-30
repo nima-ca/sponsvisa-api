@@ -1,3 +1,5 @@
+import * as dotenv from "dotenv";
+
 import { VersioningType } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { I18nValidationExceptionFilter, I18nValidationPipe } from "nestjs-i18n";
@@ -6,6 +8,7 @@ import { AllExceptionFilter } from "./common/httpExceptions/http-exception.filte
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
 
+dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -47,6 +50,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT ?? 4000);
 }
 bootstrap();
