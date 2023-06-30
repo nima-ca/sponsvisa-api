@@ -14,7 +14,7 @@ RUN npm ci
 COPY . .
 
 # Build the app
-RUN npx prisma generate
+RUN npm run prod:gen
 RUN npm run build
 
 
@@ -22,4 +22,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Start the app
-CMD ["node", "dist/main.js"]
+CMD ["npm", "run", "prod"]

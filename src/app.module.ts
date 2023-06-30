@@ -21,6 +21,9 @@ import { BookmarkModule } from "./bookmark/bookmark.module";
       isGlobal: true,
       validationSchema,
       load: [config],
+      envFilePath: `${
+        process.env.NODE_ENV === `development` ? `dev.env` : `prod.env`
+      }`,
     }),
     I18nModule.forRoot({
       fallbackLanguage: `en`,
