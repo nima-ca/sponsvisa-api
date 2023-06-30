@@ -14,7 +14,7 @@ RUN npm ci
 COPY . .
 
 # Build the app
-RUN npm run prod:gen
+RUN npm run gen
 RUN npm run build
 
 
