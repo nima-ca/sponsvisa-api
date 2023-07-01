@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            cd ${{ secrets.WORKING_DIR }}
+            cd /home/sponsvisa/sponsvisa-api
             docker compose pull
             docker compose up -d
             exit
