@@ -9,6 +9,15 @@ env:
   IMAGE_NAME: ${{ github.actor }}/sponsvisa-api:latest
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+      - run: npm ci
+      - run: npm test
+
   publish:
     name: Publish Image
     runs-on: ubuntu-latest
@@ -28,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: install ssh keys
+      - name: Connect to Server and pull the docker image and run
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -36,7 +45,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            cd /home/sponsvisa/sponsvisa-api
+            cd ${{ secrets.WORK_DIR }}
             docker compose pull
             docker compose up -d
             exit
