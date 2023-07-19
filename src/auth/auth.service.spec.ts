@@ -13,6 +13,7 @@ import {
 import {
   PrismaServiceMock,
   VerificationServiceMock,
+  mockUser,
 } from "src/common/utils/generator.utils";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
@@ -29,6 +30,7 @@ import { IncorrectCredentialsException } from "./exceptions/incorrect-credential
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
 import { IGenerateTokens } from "./types/auth.types";
 import { VerificationService } from "./verification.service";
+import { User } from "@prisma/client";
 
 jest.mock(`bcrypt`);
 describe(`AuthService`, () => {
@@ -40,6 +42,7 @@ describe(`AuthService`, () => {
   const i18n = {
     t: jest.fn().mockReturnValue(`random translated text`),
   } as unknown as I18nContext<I18nTranslations>;
+  let mockedUser: User;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -67,6 +70,7 @@ describe(`AuthService`, () => {
     verificationService = module.get<VerificationService>(
       VerificationService,
     ) as unknown as VerificationServiceMock;
+    mockedUser = mockUser();
   });
 
   it(`should be defined`, () => {
@@ -165,8 +169,6 @@ describe(`AuthService`, () => {
       password: `P@assw0rd`,
     };
 
-    const mockedUser = { id: 1, password: `random-hashed-password` };
-
     it(`should find the user`, async () => {
       prisma.user.findFirst.mockReturnValue({ id: 1 });
 
@@ -222,6 +224,13 @@ describe(`AuthService`, () => {
         error: null,
         token: MOCKED_GENERATED_TOKENS.token,
         refreshToken: MOCKED_GENERATED_TOKENS.refreshToken,
+        user: {
+          id: mockedUser.id,
+          email: mockedUser.email,
+          isVerified: mockedUser.isVerified,
+          name: mockedUser.name,
+          role: mockedUser.role,
+        },
       };
 
       prisma.user.findFirst.mockReturnValue(mockedUser);
@@ -250,12 +259,12 @@ describe(`AuthService`, () => {
     };
 
     it(`should validate the refresh token and return new tokens`, async () => {
-      const payload = { id: 123 };
+      const payload = { id: mockedUser.id };
 
       // Mocking the dependencies
       jwtService.verifyRefreshToken = jest.fn().mockReturnValue(payload);
       prisma.user.findFirst.mockResolvedValueOnce({
-        id: payload.id,
+        ...mockedUser,
         refresh_token: `hashed-refresh-token`,
       });
 
@@ -294,6 +303,13 @@ describe(`AuthService`, () => {
         error: null,
         token: newTokens.token,
         refreshToken: newTokens.refreshToken,
+        user: {
+          id: mockedUser.id,
+          email: mockedUser.email,
+          isVerified: mockedUser.isVerified,
+          name: mockedUser.name,
+          role: mockedUser.role,
+        },
       };
       expect(result).toEqual(EXPECTED_RESULT);
     });

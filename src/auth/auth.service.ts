@@ -95,7 +95,19 @@ export class AuthService {
       data: { refresh_token: hashedRefreshToken },
     });
 
-    return { success: true, error: null, token, refreshToken };
+    return {
+      success: true,
+      error: null,
+      token,
+      refreshToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+    };
   }
 
   async validateRefreshToken(
@@ -145,6 +157,13 @@ export class AuthService {
       error: null,
       token: newToken,
       refreshToken: newRefreshToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
     };
   }
 

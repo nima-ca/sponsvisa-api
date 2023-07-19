@@ -10,6 +10,7 @@ import { I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { MailService } from "src/mail/mail.service";
 import { VerificationService } from "./verification.service";
+import { mockUser } from "src/common/utils/generator.utils";
 
 describe(`AuthController`, () => {
   let service: AuthService;
@@ -55,6 +56,7 @@ describe(`AuthController`, () => {
   });
 
   describe(`Login`, () => {
+    const mockedUser = mockUser();
     it(`should return a token`, async () => {
       const mockedLoginDto: LoginDto = {
         email: `upchh@example.com`,
@@ -65,6 +67,13 @@ describe(`AuthController`, () => {
         error: null,
         token: `some random token`,
         refreshToken: `some random refresh token`,
+        user: {
+          id: mockedUser.id,
+          email: mockedUser.email,
+          isVerified: mockedUser.isVerified,
+          name: mockedUser.name,
+          role: mockedUser.role,
+        },
       };
       jest.spyOn(service, `login`).mockImplementation(async () => result);
       expect(await controller.login(mockedLoginDto, i18n)).toBe(result);
