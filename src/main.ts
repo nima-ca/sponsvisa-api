@@ -42,13 +42,13 @@ async function bootstrap() {
     }),
   );
 
-  app.use(
-    helmet({
-      crossOriginResourcePolicy: {
-        policy: `same-site`,
-      },
-    }),
-  );
+  app.enableCors({
+    origin: true,
+    methods: `GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS`,
+    credentials: true,
+  });
+
+  app.use(helmet());
 
   await app.listen(process.env.PORT ?? 4000);
 }
