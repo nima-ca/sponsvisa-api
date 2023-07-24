@@ -18,6 +18,7 @@ import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_MIN_LENGTH_MESSAGE,
 } from "../constants/auth.constants";
+import { User } from "@prisma/client";
 
 export class LoginDto {
   @IsDefined({ message: EMAIL_IS_NOT_VALID_MESSAGE })
@@ -35,4 +36,6 @@ export class LoginDto {
   password: string;
 }
 
-export class LoginResponseDto extends CoreResponseDto {}
+export class LoginResponseDto extends CoreResponseDto {
+  user: Pick<User, `id` | `email` | `name` | `role` | `isVerified`>;
+}

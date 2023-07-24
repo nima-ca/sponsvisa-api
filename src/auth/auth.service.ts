@@ -115,7 +115,17 @@ export class AuthService {
       REFRESH_TOKEN_COOKIE_CONFIG,
     );
 
-    return { success: true, error: null };
+    return {
+      success: true,
+      error: null,
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+    };
   }
 
   async validateRefreshToken(
