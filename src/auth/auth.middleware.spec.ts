@@ -7,6 +7,10 @@ import { ConfigService } from "@nestjs/config";
 import * as httpMocks from "node-mocks-http";
 import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 import { Request, Response } from "express";
+import {
+  ACCESS_TOKEN_KEY_IN_COOKIE,
+  REFRESH_TOKEN_KEY_IN_COOKIE,
+} from "./constants/auth.constants";
 
 describe(`AuthMiddleware`, () => {
   let authMiddleware: AuthMiddleware;
@@ -71,60 +75,47 @@ describe(`AuthMiddleware`, () => {
     });
   });
 
-  describe(`Extract Token From Header`, () => {
-    it(`should return token if starts with Bearer`, () => {
-      const MOCKED_TOKEN = `some-random-token`;
-      const req = httpMocks.createRequest();
-      req.headers.authorization = `Bearer ${MOCKED_TOKEN}`;
-
-      expect(authMiddleware.extractTokenFromHeader(req)).toBe(MOCKED_TOKEN);
-      expect.hasAssertions();
-    });
-
-    it(`should return undefined if Bearer token is not found in the header`, () => {
-      const req = httpMocks.createRequest();
-      req.headers.authorization = ``;
-
-      expect(authMiddleware.extractTokenFromHeader(req)).toBe(undefined);
-      expect.hasAssertions();
-    });
-  });
-
   describe(`Validate Request`, () => {
     const req = httpMocks.createRequest();
-    it(`should extract token and return null if it is not found`, async () => {
-      authMiddleware.extractTokenFromHeader = jest
-        .fn()
-        .mockReturnValue(undefined);
-
+    it(`should extract tokens and return null if it is not found`, async () => {
+      req.cookies = {};
       const result = await authMiddleware.validateRequest(req);
 
       expect(result).toBeNull();
-      expect(authMiddleware.extractTokenFromHeader).toHaveBeenCalledTimes(1);
       expect.hasAssertions();
     });
 
     it(`should verify token and return null if it was not valid`, async () => {
-      const MOCKED_TOKEN = `some-random-token`;
-      authMiddleware.extractTokenFromHeader = jest
-        .fn()
-        .mockReturnValue(MOCKED_TOKEN);
+      const MOCKED_ACCESS_TOKEN = `some-random-token`;
+      const MOCKED_REFRESH_TOKEN = `some-random-refresh-token`;
+
+      req.cookies = {
+        [ACCESS_TOKEN_KEY_IN_COOKIE]: MOCKED_ACCESS_TOKEN,
+        [REFRESH_TOKEN_KEY_IN_COOKIE]: MOCKED_REFRESH_TOKEN,
+      };
+
       jwtService.verifyAccessToken = jest.fn().mockReturnValue(null);
 
       const result = await authMiddleware.validateRequest(req);
 
       expect(result).toBeNull();
       expect(jwtService.verifyAccessToken).toHaveBeenCalledTimes(1);
-      expect(jwtService.verifyAccessToken).toHaveBeenCalledWith(MOCKED_TOKEN);
+      expect(jwtService.verifyAccessToken).toHaveBeenCalledWith(
+        MOCKED_ACCESS_TOKEN,
+      );
       expect.hasAssertions();
     });
 
     it(`should find the user and return null if not found`, async () => {
-      const MOCKED_TOKEN = `some-random-token`;
+      const MOCKED_ACCESS_TOKEN = `some-random-token`;
+      const MOCKED_REFRESH_TOKEN = `some-random-refresh-token`;
+
+      req.cookies = {
+        [ACCESS_TOKEN_KEY_IN_COOKIE]: MOCKED_ACCESS_TOKEN,
+        [REFRESH_TOKEN_KEY_IN_COOKIE]: MOCKED_REFRESH_TOKEN,
+      };
+
       const TOKEN_PAYLOAD: IAccessTokenPayload = { id: 1 };
-      authMiddleware.extractTokenFromHeader = jest
-        .fn()
-        .mockReturnValue(MOCKED_TOKEN);
       jwtService.verifyAccessToken = jest.fn().mockReturnValue(TOKEN_PAYLOAD);
       authMiddleware.getUser = jest.fn().mockResolvedValue(null);
 
@@ -137,12 +128,17 @@ describe(`AuthMiddleware`, () => {
     });
 
     it(`should return the user if user is found`, async () => {
+      const MOCKED_ACCESS_TOKEN = `some-random-token`;
+      const MOCKED_REFRESH_TOKEN = `some-random-refresh-token`;
+
+      req.cookies = {
+        [ACCESS_TOKEN_KEY_IN_COOKIE]: MOCKED_ACCESS_TOKEN,
+        [REFRESH_TOKEN_KEY_IN_COOKIE]: MOCKED_REFRESH_TOKEN,
+      };
+
       const MOCKED_USER = { id: 1 };
-      const MOCKED_TOKEN = `some-random-token`;
       const TOKEN_PAYLOAD: IAccessTokenPayload = { id: 1 };
-      authMiddleware.extractTokenFromHeader = jest
-        .fn()
-        .mockReturnValue(MOCKED_TOKEN);
+
       jwtService.verifyAccessToken = jest.fn().mockReturnValue(TOKEN_PAYLOAD);
       authMiddleware.getUser = jest.fn().mockResolvedValue(MOCKED_USER);
 

@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
+import { Response } from "express";
 import { I18nContext } from "nestjs-i18n";
 import {
   IAccessTokenPayload,
@@ -8,6 +9,12 @@ import {
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
+import {
+  ACCESS_TOKEN_COOKIE_CONFIG,
+  ACCESS_TOKEN_KEY_IN_COOKIE,
+  REFRESH_TOKEN_COOKIE_CONFIG,
+  REFRESH_TOKEN_KEY_IN_COOKIE,
+} from "./constants/auth.constants";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import {
   ValidateRefreshTokenDto,
@@ -16,15 +23,8 @@ import {
 import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
 import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
-import { IGenerateTokens } from "./types/auth.types";
+import { IGenerateTokens, ITokens } from "./types/auth.types";
 import { VerificationService } from "./verification.service";
-import { Response } from "express";
-import {
-  ACCESS_TOKEN_COOKIE_CONFIG,
-  ACCESS_TOKEN_KEY_IN_COOKIE,
-  REFRESH_TOKEN_COOKIE_CONFIG,
-  REFRESH_TOKEN_KEY_IN_COOKIE,
-} from "./constants/auth.constants";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -93,27 +93,15 @@ export class AuthService {
     // create token and refresh token and hash refresh token to save in db
     const tokenPayload: IAccessTokenPayload = { id: user.id };
     const refreshTokenPayload: IRefreshTokenPayload = { id: user.id };
-    const { hashedRefreshToken, refreshToken, token } = this.generateTokens(
-      tokenPayload,
-      refreshTokenPayload,
-    );
+    const { hashedRefreshToken, refreshToken, accessToken } =
+      this.generateTokens(tokenPayload, refreshTokenPayload);
 
     await this.prisma.user.update({
       where: { id: user.id },
       data: { refresh_token: hashedRefreshToken },
     });
 
-    // set access token and refresh token in the response cookie
-    response.cookie(
-      ACCESS_TOKEN_KEY_IN_COOKIE,
-      token,
-      ACCESS_TOKEN_COOKIE_CONFIG,
-    );
-    response.cookie(
-      REFRESH_TOKEN_KEY_IN_COOKIE,
-      refreshToken,
-      REFRESH_TOKEN_COOKIE_CONFIG,
-    );
+    this.setTokensInCookie({ accessToken, refreshToken }, response);
 
     return {
       success: true,
@@ -161,7 +149,7 @@ export class AuthService {
     const tokenPayload: IAccessTokenPayload = { id: user.id };
     const refreshTokenPayload: IRefreshTokenPayload = { id: user.id };
     const {
-      token: newToken,
+      accessToken: newAccessToken,
       refreshToken: newRefreshToken,
       hashedRefreshToken,
     } = this.generateTokens(tokenPayload, refreshTokenPayload);
@@ -171,15 +159,9 @@ export class AuthService {
       data: { refresh_token: hashedRefreshToken },
     });
 
-    response.cookie(
-      ACCESS_TOKEN_KEY_IN_COOKIE,
-      newToken,
-      ACCESS_TOKEN_COOKIE_CONFIG,
-    );
-    response.cookie(
-      REFRESH_TOKEN_KEY_IN_COOKIE,
-      newRefreshToken,
-      REFRESH_TOKEN_COOKIE_CONFIG,
+    this.setTokensInCookie(
+      { accessToken: newAccessToken, refreshToken: newRefreshToken },
+      response,
     );
 
     return {
@@ -192,9 +174,25 @@ export class AuthService {
     tokenPayload: IAccessTokenPayload,
     refreshTokenPayload: IRefreshTokenPayload,
   ): IGenerateTokens {
-    const token = this.jwtService.signAccessToken(tokenPayload);
+    const accessToken = this.jwtService.signAccessToken(tokenPayload);
     const refreshToken = this.jwtService.signRefreshToken(refreshTokenPayload);
     const hashedRefreshToken = bcrypt.hashSync(refreshToken, 10);
-    return { token, refreshToken, hashedRefreshToken };
+    return { accessToken, refreshToken, hashedRefreshToken };
+  }
+
+  setTokensInCookie(
+    { accessToken, refreshToken }: ITokens,
+    response: Response,
+  ): void {
+    response.cookie(
+      ACCESS_TOKEN_KEY_IN_COOKIE,
+      accessToken,
+      ACCESS_TOKEN_COOKIE_CONFIG,
+    );
+    response.cookie(
+      REFRESH_TOKEN_KEY_IN_COOKIE,
+      refreshToken,
+      REFRESH_TOKEN_COOKIE_CONFIG,
+    );
   }
 }
