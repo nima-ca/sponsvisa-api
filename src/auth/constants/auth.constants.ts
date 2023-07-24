@@ -74,6 +74,19 @@ export const REFRESH_TOKEN_IS_NOT_VALID_MESSAGE =
 
 // auth
 export const AUTH_USER_KEY_IN_REQUEST = `AUTH_USER`;
-export const VERIFICATION_CODE_SEED = `1234567890ABCDEFGHIGKLMONPQRSZUVWXT`;
+export const VERIFICATION_CODE_SEED = `1234567890`;
 export const VERIFICATION_CODE_LENGTH = 6;
 export const VERIFICATION_CODE_EXPIRE_TIME_IN_MINUTES = 2;
+
+export const ACCESS_TOKEN_COOKIE_CONFIG = {
+  httpOnly: true,
+  maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+};
+
+export const REFRESH_TOKEN_COOKIE_CONFIG = {
+  ...ACCESS_TOKEN_COOKIE_CONFIG,
+  maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+};
+
+export const ACCESS_TOKEN_KEY_IN_COOKIE = `accessToken`;
+export const REFRESH_TOKEN_KEY_IN_COOKIE = `refreshToken`;

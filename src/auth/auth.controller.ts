@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, Res } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { I18n, I18nContext } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
@@ -15,6 +15,7 @@ import {
   VerifyCodeDto,
   VerifyCodeResponseDto,
 } from "./dto/verification.dto";
+import { Response } from "express";
 
 @ApiTags(`auth`)
 @Controller({
@@ -37,18 +38,24 @@ export class AuthController {
 
   @Post(`login`)
   login(
+    @Res({ passthrough: true }) response: Response,
     @Body() loginDto: LoginDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<LoginResponseDto> {
-    return this.authService.login(loginDto, i18n);
+    return this.authService.login(loginDto, i18n, response);
   }
 
   @Post(`refresh_token`)
   validateRefreshToken(
+    @Res({ passthrough: true }) response: Response,
     @Body() validateRefreshTokenDto: ValidateRefreshTokenDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<LoginResponseDto> {
-    return this.authService.validateRefreshToken(validateRefreshTokenDto, i18n);
+    return this.authService.validateRefreshToken(
+      validateRefreshTokenDto,
+      i18n,
+      response,
+    );
   }
 
   @Post(`verify_code`)

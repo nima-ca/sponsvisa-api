@@ -35,7 +35,4 @@ export class LoginDto {
   password: string;
 }
 
-export class LoginResponseDto extends CoreResponseDto {
-  token: string | null;
-  refreshToken: string | null;
-}
+export class LoginResponseDto extends CoreResponseDto {}

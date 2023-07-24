@@ -18,6 +18,13 @@ import { IncorrectCredentialsException } from "./exceptions/incorrect-credential
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
 import { IGenerateTokens } from "./types/auth.types";
 import { VerificationService } from "./verification.service";
+import { Response } from "express";
+import {
+  ACCESS_TOKEN_COOKIE_CONFIG,
+  ACCESS_TOKEN_KEY_IN_COOKIE,
+  REFRESH_TOKEN_COOKIE_CONFIG,
+  REFRESH_TOKEN_KEY_IN_COOKIE,
+} from "./constants/auth.constants";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -61,6 +68,7 @@ export class AuthService {
   async login(
     { email, password }: LoginDto,
     i18n: I18nContext<I18nTranslations>,
+    response: Response,
   ): Promise<LoginResponseDto> {
     const user = await this.prisma.user.findFirst({
       where: { email },
@@ -95,12 +103,25 @@ export class AuthService {
       data: { refresh_token: hashedRefreshToken },
     });
 
-    return { success: true, error: null, token, refreshToken };
+    // set access token and refresh token in the response cookie
+    response.cookie(
+      ACCESS_TOKEN_KEY_IN_COOKIE,
+      token,
+      ACCESS_TOKEN_COOKIE_CONFIG,
+    );
+    response.cookie(
+      REFRESH_TOKEN_KEY_IN_COOKIE,
+      refreshToken,
+      REFRESH_TOKEN_COOKIE_CONFIG,
+    );
+
+    return { success: true, error: null };
   }
 
   async validateRefreshToken(
     { refreshToken }: ValidateRefreshTokenDto,
     i18n: I18nContext<I18nTranslations>,
+    response: Response,
   ): Promise<ValidateRefreshTokenResponseDto> {
     const payload =
       this.jwtService.verifyRefreshToken<IAccessTokenPayload>(refreshToken);
@@ -140,11 +161,20 @@ export class AuthService {
       data: { refresh_token: hashedRefreshToken },
     });
 
+    response.cookie(
+      ACCESS_TOKEN_KEY_IN_COOKIE,
+      newToken,
+      ACCESS_TOKEN_COOKIE_CONFIG,
+    );
+    response.cookie(
+      REFRESH_TOKEN_KEY_IN_COOKIE,
+      newRefreshToken,
+      REFRESH_TOKEN_COOKIE_CONFIG,
+    );
+
     return {
       success: true,
       error: null,
-      token: newToken,
-      refreshToken: newRefreshToken,
     };
   }
 
