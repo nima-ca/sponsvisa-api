@@ -1,20 +1,24 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, Res } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { User } from "@prisma/client";
+import { Response } from "express";
 import { I18n, I18nContext } from "nestjs-i18n";
+import { AuthUser } from "src/common/decorators/auth-user.decorator";
+import { setRole } from "src/common/decorators/setRole.decorator";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { AuthService } from "./auth.service";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
+import {
+  ValidateRefreshTokenDto,
+  ValidateRefreshTokenResponseDto,
+} from "./dto/refreshToken.dto";
 import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
-import { ValidateRefreshTokenDto } from "./dto/refreshToken.dto";
-import { VerificationService } from "./verification.service";
-import { setRole } from "src/common/decorators/setRole.decorator";
-import { AuthUser } from "src/common/decorators/auth-user.decorator";
-import { User } from "@prisma/client";
 import {
   SendVerificationCodeResponseDto,
   VerifyCodeDto,
   VerifyCodeResponseDto,
 } from "./dto/verification.dto";
+import { VerificationService } from "./verification.service";
 
 @ApiTags(`auth`)
 @Controller({
@@ -37,18 +41,24 @@ export class AuthController {
 
   @Post(`login`)
   login(
+    @Res({ passthrough: true }) response: Response,
     @Body() loginDto: LoginDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<LoginResponseDto> {
-    return this.authService.login(loginDto, i18n);
+    return this.authService.login(loginDto, i18n, response);
   }
 
   @Post(`refresh_token`)
   validateRefreshToken(
+    @Res({ passthrough: true }) response: Response,
     @Body() validateRefreshTokenDto: ValidateRefreshTokenDto,
     @I18n() i18n: I18nContext<I18nTranslations>,
-  ): Promise<LoginResponseDto> {
-    return this.authService.validateRefreshToken(validateRefreshTokenDto, i18n);
+  ): Promise<ValidateRefreshTokenResponseDto> {
+    return this.authService.validateRefreshToken(
+      validateRefreshTokenDto,
+      i18n,
+      response,
+    );
   }
 
   @Post(`verify_code`)

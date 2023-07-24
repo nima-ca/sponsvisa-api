@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { LoginResponseDto } from "./login.dto";
+import { CoreResponseDto } from "src/common/dto/common.dto";
 import { REFRESH_TOKEN_IS_NOT_VALID_MESSAGE } from "../constants/auth.constants";
 
 export class ValidateRefreshTokenDto {
@@ -8,4 +8,4 @@ export class ValidateRefreshTokenDto {
   refreshToken: string;
 }
 
-export class ValidateRefreshTokenResponseDto extends LoginResponseDto {}
+export class ValidateRefreshTokenResponseDto extends CoreResponseDto {}

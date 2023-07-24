@@ -4,7 +4,11 @@ import { NextFunction, Request, Response } from "express";
 import { IAccessTokenPayload } from "src/common/config/interfaces/jwt.interface";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
-import { AUTH_USER_KEY_IN_REQUEST } from "./constants/auth.constants";
+import {
+  ACCESS_TOKEN_KEY_IN_COOKIE,
+  AUTH_USER_KEY_IN_REQUEST,
+  REFRESH_TOKEN_KEY_IN_COOKIE,
+} from "./constants/auth.constants";
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -21,23 +25,21 @@ export class AuthMiddleware implements NestMiddleware {
 
   async validateRequest(req: Request): Promise<User | null> {
     // extract token from header
-    const token = this.extractTokenFromHeader(req);
-    if (!token) return null;
+    const accessToken = req.cookies?.[ACCESS_TOKEN_KEY_IN_COOKIE];
+    const refreshToken = req.cookies?.[REFRESH_TOKEN_KEY_IN_COOKIE];
+    if (!accessToken || !refreshToken) return null;
 
     // verify token and extract payload
     const payload =
-      this.jwtService.verifyAccessToken<IAccessTokenPayload | null>(token);
+      this.jwtService.verifyAccessToken<IAccessTokenPayload | null>(
+        accessToken,
+      );
     if (!payload) return null;
 
     const user = await this.getUser(payload.id);
     if (!user) return null;
 
     return user;
-  }
-
-  extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(` `) ?? [];
-    return type === `Bearer` ? token : undefined;
   }
 
   async getUser(id: number): Promise<User | null> {

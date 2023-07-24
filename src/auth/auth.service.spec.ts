@@ -4,30 +4,38 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
+import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { Response } from "express";
 import { I18nContext } from "nestjs-i18n";
+import * as httpMocks from "node-mocks-http";
 import {
   IAccessTokenPayload,
   IRefreshTokenPayload,
 } from "src/common/config/interfaces/jwt.interface";
+import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
 import {
   PrismaServiceMock,
   VerificationServiceMock,
+  mockUser,
 } from "src/common/utils/generator.utils";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 import { JwtService } from "src/jwt/jwt.service";
 import { MailService } from "src/mail/mail.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthService, PASSWORD_HASH_SALT } from "./auth.service";
-import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import {
-  ValidateRefreshTokenDto,
-  ValidateRefreshTokenResponseDto,
-} from "./dto/refreshToken.dto";
+  ACCESS_TOKEN_COOKIE_CONFIG,
+  ACCESS_TOKEN_KEY_IN_COOKIE,
+  REFRESH_TOKEN_COOKIE_CONFIG,
+  REFRESH_TOKEN_KEY_IN_COOKIE,
+} from "./constants/auth.constants";
+import { LoginDto, LoginResponseDto } from "./dto/login.dto";
+import { ValidateRefreshTokenDto } from "./dto/refreshToken.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { IncorrectCredentialsException } from "./exceptions/incorrect-credentials.exception";
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
-import { IGenerateTokens } from "./types/auth.types";
+import { IGenerateTokens, ITokens } from "./types/auth.types";
 import { VerificationService } from "./verification.service";
 
 jest.mock(`bcrypt`);
@@ -40,6 +48,7 @@ describe(`AuthService`, () => {
   const i18n = {
     t: jest.fn().mockReturnValue(`random translated text`),
   } as unknown as I18nContext<I18nTranslations>;
+  let mockedUser: User;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -67,6 +76,7 @@ describe(`AuthService`, () => {
     verificationService = module.get<VerificationService>(
       VerificationService,
     ) as unknown as VerificationServiceMock;
+    mockedUser = mockUser();
   });
 
   it(`should be defined`, () => {
@@ -165,14 +175,17 @@ describe(`AuthService`, () => {
       password: `P@assw0rd`,
     };
 
-    const mockedUser = { id: 1, password: `random-hashed-password` };
+    let res: Response;
+    beforeEach(() => {
+      res = httpMocks.createResponse();
+    });
 
     it(`should find the user`, async () => {
       prisma.user.findFirst.mockReturnValue({ id: 1 });
 
-      try {
-        await service.login(userInput, i18n);
-      } catch (error) {}
+      expect(
+        async () => await service.login(userInput, i18n, res),
+      ).rejects.toThrow();
 
       expect(prisma.user.findFirst).toHaveBeenCalledTimes(1);
       expect(prisma.user.findFirst).toHaveBeenCalledWith({
@@ -185,7 +198,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst.mockReturnValue(null);
 
       expect(
-        async () => await service.login(userInput, i18n),
+        async () => await service.login(userInput, i18n, res),
       ).rejects.toThrowError(IncorrectCredentialsException);
 
       expect.hasAssertions();
@@ -196,7 +209,7 @@ describe(`AuthService`, () => {
       jest.mocked(bcrypt.compareSync).mockReturnValue(false);
 
       try {
-        await service.login(userInput, i18n);
+        await service.login(userInput, i18n, res);
       } catch (error) {
         expect(error).toBeDefined();
         expect(error).toBeInstanceOf(IncorrectCredentialsException);
@@ -210,9 +223,9 @@ describe(`AuthService`, () => {
       expect.hasAssertions();
     });
 
-    it(`should create and return token`, async () => {
+    it(`should create and set access and refresh tokens`, async () => {
       const MOCKED_GENERATED_TOKENS: IGenerateTokens = {
-        token: `some random token`,
+        accessToken: `some random token`,
         hashedRefreshToken: `hashed refresh token`,
         refreshToken: `some random refresh token`,
       };
@@ -220,8 +233,13 @@ describe(`AuthService`, () => {
       const EXPECTED_LOGIN_RESULT_DTO: LoginResponseDto = {
         success: true,
         error: null,
-        token: MOCKED_GENERATED_TOKENS.token,
-        refreshToken: MOCKED_GENERATED_TOKENS.refreshToken,
+        user: {
+          id: mockedUser.id,
+          email: mockedUser.email,
+          isVerified: mockedUser.isVerified,
+          name: mockedUser.name,
+          role: mockedUser.role,
+        },
       };
 
       prisma.user.findFirst.mockReturnValue(mockedUser);
@@ -230,9 +248,20 @@ describe(`AuthService`, () => {
         .fn()
         .mockReturnValue(MOCKED_GENERATED_TOKENS);
 
-      const result = await service.login(userInput, i18n);
+      service.setTokensInCookie = jest.fn();
+
+      const result = await service.login(userInput, i18n, res);
 
       expect(service.generateTokens).toHaveBeenCalledTimes(1);
+      expect(service.setTokensInCookie).toHaveBeenCalledTimes(1);
+      expect(service.setTokensInCookie).toHaveBeenCalledWith(
+        {
+          accessToken: MOCKED_GENERATED_TOKENS.accessToken,
+          refreshToken: MOCKED_GENERATED_TOKENS.refreshToken,
+        },
+        res,
+      );
+
       expect(prisma.user.update).toHaveBeenCalledTimes(1);
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: mockedUser.id },
@@ -249,13 +278,18 @@ describe(`AuthService`, () => {
       refreshToken: MOCKED_REFRESH_TOKEN,
     };
 
-    it(`should validate the refresh token and return new tokens`, async () => {
-      const payload = { id: 123 };
+    let res: Response;
+    beforeEach(() => {
+      res = httpMocks.createResponse();
+    });
+
+    it(`should validate the refresh token and set new tokens`, async () => {
+      const payload = { id: mockedUser.id };
 
       // Mocking the dependencies
       jwtService.verifyRefreshToken = jest.fn().mockReturnValue(payload);
       prisma.user.findFirst.mockResolvedValueOnce({
-        id: payload.id,
+        ...mockedUser,
         refresh_token: `hashed-refresh-token`,
       });
 
@@ -264,14 +298,15 @@ describe(`AuthService`, () => {
 
       // mock generateToken method
       const newTokens: IGenerateTokens = {
-        token: `new-token`,
+        accessToken: `new-token`,
         refreshToken: `new-refresh-token`,
         hashedRefreshToken: `new-hashed-refresh-token`,
       };
       service.generateTokens = jest.fn().mockReturnValueOnce(newTokens);
+      service.setTokensInCookie = jest.fn();
 
       // call the service
-      const result = await service.validateRefreshToken(dto, i18n);
+      const result = await service.validateRefreshToken(dto, i18n, res);
 
       expect(jwtService.verifyRefreshToken).toHaveBeenCalledWith(
         MOCKED_REFRESH_TOKEN,
@@ -289,20 +324,23 @@ describe(`AuthService`, () => {
         data: { refresh_token: newTokens.hashedRefreshToken },
       });
 
-      const EXPECTED_RESULT: ValidateRefreshTokenResponseDto = {
-        success: true,
-        error: null,
-        token: newTokens.token,
-        refreshToken: newTokens.refreshToken,
-      };
-      expect(result).toEqual(EXPECTED_RESULT);
+      expect(service.setTokensInCookie).toHaveBeenCalledTimes(1);
+      expect(service.setTokensInCookie).toHaveBeenCalledWith(
+        {
+          accessToken: newTokens.accessToken,
+          refreshToken: newTokens.refreshToken,
+        },
+        res,
+      );
+
+      expect(result).toEqual(CORE_SUCCESS_DTO);
     });
 
     it(`should fail if the token is invalid`, () => {
       jwtService.verifyRefreshToken = jest.fn().mockReturnValue(null);
 
       expect(async () =>
-        service.validateRefreshToken(dto, i18n),
+        service.validateRefreshToken(dto, i18n, res),
       ).rejects.toThrowError(UnauthorizedException);
 
       expect(jwtService.verifyRefreshToken).toHaveBeenCalledTimes(1);
@@ -318,7 +356,7 @@ describe(`AuthService`, () => {
       prisma.user.findFirst = jest.fn().mockReturnValue(null);
 
       expect(async () =>
-        service.validateRefreshToken(dto, i18n),
+        service.validateRefreshToken(dto, i18n, res),
       ).rejects.toThrowError(UnauthorizedException);
       expect(prisma.user.findFirst).toHaveBeenCalledTimes(1);
       expect(prisma.user.findFirst).toHaveBeenCalledWith({
@@ -338,7 +376,7 @@ describe(`AuthService`, () => {
       jest.mocked(bcrypt.compareSync).mockReturnValue(false);
 
       expect(async () =>
-        service.validateRefreshToken(dto, i18n),
+        service.validateRefreshToken(dto, i18n, res),
       ).rejects.toThrowError(UnauthorizedException);
       expect(bcrypt.compareSync).toHaveBeenCalledWith(
         MOCKED_REFRESH_TOKEN,
@@ -371,7 +409,7 @@ describe(`AuthService`, () => {
       };
 
       const EXPECTED_RESULT: IGenerateTokens = {
-        token: MOCKED_JWT_SIGN_ACCESS_TOKEN_RES,
+        accessToken: MOCKED_JWT_SIGN_ACCESS_TOKEN_RES,
         refreshToken: MOCKED_JWT_SIGN_REFRESH_TOKEN_RES,
         hashedRefreshToken: MOCKED_BCRYPT_HASH_RES,
       };
@@ -382,6 +420,41 @@ describe(`AuthService`, () => {
       );
 
       expect(result).toEqual(EXPECTED_RESULT);
+      expect.hasAssertions();
+    });
+  });
+
+  describe(`setTokensInCookie`, () => {
+    let res: Response;
+    beforeEach(() => {
+      res = httpMocks.createResponse();
+    });
+
+    it(`should set access and refresh tokens in the response cookie`, () => {
+      const tokens: ITokens = {
+        accessToken: `some random token`,
+        refreshToken: `some random refresh token`,
+      };
+      const cookieFnMock = jest.fn();
+      res.cookie = cookieFnMock;
+
+      service.setTokensInCookie(tokens, res);
+
+      expect(cookieFnMock).toHaveBeenCalledTimes(2);
+      expect(cookieFnMock).toHaveBeenNthCalledWith(
+        1,
+        ACCESS_TOKEN_KEY_IN_COOKIE,
+        tokens.accessToken,
+        ACCESS_TOKEN_COOKIE_CONFIG,
+      );
+
+      expect(cookieFnMock).toHaveBeenNthCalledWith(
+        2,
+        REFRESH_TOKEN_KEY_IN_COOKIE,
+        tokens.refreshToken,
+        REFRESH_TOKEN_COOKIE_CONFIG,
+      );
+
       expect.hasAssertions();
     });
   });
