@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-
+import * as cookieParser from "cookie-parser";
 import { VersioningType } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { I18nValidationExceptionFilter, I18nValidationPipe } from "nestjs-i18n";
@@ -11,6 +11,8 @@ import helmet from "helmet";
 dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(cookieParser());
 
   // add versioning to app
   app.enableVersioning({
