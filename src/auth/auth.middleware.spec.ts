@@ -76,7 +76,11 @@ describe(`AuthMiddleware`, () => {
   });
 
   describe(`Validate Request`, () => {
-    const req = httpMocks.createRequest();
+    let req: Request;
+    beforeEach(() => {
+      req = httpMocks.createRequest();
+    });
+
     it(`should extract tokens and return null if it is not found`, async () => {
       req.cookies = {};
       const result = await authMiddleware.validateRequest(req);

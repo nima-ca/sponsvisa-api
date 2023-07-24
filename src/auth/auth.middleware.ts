@@ -19,14 +19,12 @@ export class AuthMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const user = await this.validateRequest(req);
-    console.log(user);
     req[AUTH_USER_KEY_IN_REQUEST] = user;
     next();
   }
 
   async validateRequest(req: Request): Promise<User | null> {
     // extract token from header
-    console.log(req.cookies);
     const accessToken = req.cookies?.[ACCESS_TOKEN_KEY_IN_COOKIE];
     const refreshToken = req.cookies?.[REFRESH_TOKEN_KEY_IN_COOKIE];
     if (!accessToken || !refreshToken) return null;
