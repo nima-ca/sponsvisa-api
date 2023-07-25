@@ -25,6 +25,8 @@ import { IncorrectCredentialsException } from "./exceptions/incorrect-credential
 import { UserAlreadyExistsException } from "./exceptions/user-already-exists.exception";
 import { IGenerateTokens, ITokens } from "./types/auth.types";
 import { VerificationService } from "./verification.service";
+import { CORE_SUCCESS_DTO } from "src/common/constants/dto";
+import { LogoutResponseDto } from "./dto/logout.dto";
 
 export const PASSWORD_HASH_SALT = 10;
 
@@ -168,6 +170,18 @@ export class AuthService {
       success: true,
       error: null,
     };
+  }
+
+  logout(response: Response): LogoutResponseDto {
+    response.clearCookie(
+      ACCESS_TOKEN_KEY_IN_COOKIE,
+      ACCESS_TOKEN_COOKIE_CONFIG,
+    );
+    response.clearCookie(
+      REFRESH_TOKEN_KEY_IN_COOKIE,
+      REFRESH_TOKEN_COOKIE_CONFIG,
+    );
+    return CORE_SUCCESS_DTO;
   }
 
   generateTokens(
