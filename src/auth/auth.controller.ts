@@ -19,6 +19,7 @@ import {
   VerifyCodeResponseDto,
 } from "./dto/verification.dto";
 import { VerificationService } from "./verification.service";
+import { LogoutResponseDto } from "./dto/logout.dto";
 
 @ApiTags(`auth`)
 @Controller({
@@ -46,6 +47,11 @@ export class AuthController {
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<LoginResponseDto> {
     return this.authService.login(loginDto, i18n, response);
+  }
+
+  @Post(`logout`)
+  logout(@Res({ passthrough: true }) response: Response): LogoutResponseDto {
+    return this.authService.logout(response);
   }
 
   @Post(`refresh_token`)

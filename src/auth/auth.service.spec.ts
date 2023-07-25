@@ -272,6 +272,33 @@ describe(`AuthService`, () => {
     });
   });
 
+  describe(`Logout`, () => {
+    const res = httpMocks.createResponse();
+
+    it(`should clear access and refresh tokens and return success message`, () => {
+      const clearCookieMock = jest.fn();
+      res.clearCookie = clearCookieMock;
+
+      const result = service.logout(res);
+
+      expect(result).toEqual(CORE_SUCCESS_DTO);
+      expect(clearCookieMock).toHaveBeenCalledTimes(2);
+      expect(clearCookieMock).toHaveBeenNthCalledWith(
+        1,
+        ACCESS_TOKEN_KEY_IN_COOKIE,
+        ACCESS_TOKEN_COOKIE_CONFIG,
+      );
+
+      expect(clearCookieMock).toHaveBeenNthCalledWith(
+        2,
+        REFRESH_TOKEN_KEY_IN_COOKIE,
+        REFRESH_TOKEN_COOKIE_CONFIG,
+      );
+
+      expect.hasAssertions();
+    });
+  });
+
   describe(`Refresh Token`, () => {
     const MOCKED_REFRESH_TOKEN = `your-refresh-token`;
     const dto: ValidateRefreshTokenDto = {
