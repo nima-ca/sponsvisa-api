@@ -50,7 +50,7 @@ describe(`AuthController`, () => {
         password: `P@ssw0rd`,
         confirmPassword: `P@ssw0rd`,
       };
-      const result = { success: true, error: null };
+      const result = { success: true, errors: null };
       jest.spyOn(service, `register`).mockImplementation(async () => result);
       expect(await controller.register(mockedRegisterDto, i18n)).toBe(result);
     });
@@ -66,7 +66,7 @@ describe(`AuthController`, () => {
       };
       const result: LoginResponseDto = {
         success: true,
-        error: null,
+        errors: null,
         user: {
           id: mockedUser.id,
           email: mockedUser.email,

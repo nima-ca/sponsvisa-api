@@ -24,11 +24,11 @@ export class AllExceptionFilter implements ExceptionFilter {
 
       const resObj: CoreResponseDto = {
         success: false,
-        error: [exception.message],
+        errors: [exception.message],
       };
 
       if (status.toString().startsWith(`5`)) {
-        resObj.error = [internalServerError];
+        resObj.errors = [internalServerError];
         response.status(status).json(resObj);
         return;
       }

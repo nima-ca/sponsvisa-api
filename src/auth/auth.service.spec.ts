@@ -145,7 +145,7 @@ describe(`AuthService`, () => {
           name: mockedData.name,
         },
       });
-      expect(result).toEqual({ success: true, error: null });
+      expect(result).toEqual({ success: true, errors: null });
     });
 
     it(`should send verification code`, async () => {
@@ -232,7 +232,7 @@ describe(`AuthService`, () => {
 
       const EXPECTED_LOGIN_RESULT_DTO: LoginResponseDto = {
         success: true,
-        error: null,
+        errors: null,
         user: {
           id: mockedUser.id,
           email: mockedUser.email,

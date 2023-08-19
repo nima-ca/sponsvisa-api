@@ -1,7 +1,7 @@
 import { i18nValidationMessage } from "nestjs-i18n";
 import { I18nTranslations } from "src/i18n/generated/i18n.generated";
 
-export const CORE_SUCCESS_DTO = { success: true, error: null };
+export const CORE_SUCCESS_DTO = { success: true, errors: null };
 
 export const PAGINATION_MIN_PAGE_DTO = 1;
 export const PAGINATION_MIN_LIMIT_DTO = 1;

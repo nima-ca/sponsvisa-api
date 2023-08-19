@@ -139,7 +139,11 @@ export class CompanyService {
     // get country name by its code
     const countryName = getName(company.country, i18n.lang);
 
-    return { success: true, error: null, company: { ...company, countryName } };
+    return {
+      success: true,
+      errors: null,
+      company: { ...company, countryName },
+    };
   }
 
   async update(

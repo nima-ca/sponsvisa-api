@@ -13,7 +13,7 @@ const PAGINATION_DEFAULT_LIMIT = 10;
 
 export class CoreResponseDto {
   success: boolean;
-  error: string[] | null;
+  errors: string[] | null;
 }
 
 export interface ICoreFindAllResponseDto<T = unknown> extends CoreResponseDto {
