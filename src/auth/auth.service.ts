@@ -64,7 +64,7 @@ export class AuthService {
 
     this.verificationService.sendCode(createdUser, i18n);
 
-    return { success: true, error: null };
+    return { success: true, errors: null };
   }
 
   async login(
@@ -107,7 +107,7 @@ export class AuthService {
 
     return {
       success: true,
-      error: null,
+      errors: null,
       user: {
         id: user.id,
         name: user.name,
@@ -168,7 +168,7 @@ export class AuthService {
 
     return {
       success: true,
-      error: null,
+      errors: null,
     };
   }
 

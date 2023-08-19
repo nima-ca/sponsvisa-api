@@ -35,7 +35,7 @@ export type CompanyWithCompanyName = Company & {
 export class FindAllCompaniesResponseDto
   implements ICoreFindAllResponseDto<CompanyWithCompanyName>
 {
-  error: string[];
+  errors: string[];
   items: CompanyWithCompanyName[];
   success: boolean;
   totalCount: number;
